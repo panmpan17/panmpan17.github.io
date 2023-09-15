@@ -1,0 +1,45 @@
+{
+    "my_name": "潘啟元 Michael Pan",
+    "profession": "Game Programmer, Fullstack Programmer",
+    "summary": "I'm currently studying in the Media Design Department at Tatung University. I used to work as a game programmer at Buho Interactive Entertainment for 2 years. I started learning programming in junior high school, and now I have 11 years of experience. I have a strong passion for game development, and after graduating from university, I hope to join an independent game development company and make my mark in the world of indie game development.",
+    "location": "Taipei, Taiwan",
+
+    "skill_text": "Skill / Technic",
+
+    "biography_text": "Biography",
+    "biography": "As a software engineer, I'm often asked, 'Why did you choose to study in the Media Design Department at Tatung University instead of focusing solely on programming?' The reason is my passion for creativity. Programming encompasses a wide range of fields, and I particularly enjoy areas where I can foster creativity, such as website development and game development. My work not only involves technology but also reflects my ideas and creativity, allowing others to see me.<br><br>After enrolling at Tatung University, I didn't limit myself to being just a programmer. I explored many courses related to design and management, hoping that through these experiences, I could better communicate with other team members, understand their thought processes, and help them achieve the best results. Whenever there was an opportunity for teamwork, I immediately stepped up as a leader. This not only encouraged everyone to share ideas and creativity but also enhanced our technical skills to ensure that these creative ideas could be realized.<br><br>My expectations for future work are the same – I don't want to be just a programmer; I want to be a team leader who can create exceptional work.",
+
+    "school_work_history_text": "School / Work History",
+    "school_work_history": [
+        {
+            "position": "Department of Media Design (Digital Game Design Group)",
+            "location": "Tatung University",
+            "time": "Sep 2020 - Present",
+            "summary": "After working for two years, I came to Tatung University to study, gaining knowledge and skills in different areas of gaming, improving my interpersonal skills, and seizing every opportunity to lead teams.<br>During my studies, I participated in four research projects led by professors, focusing on VR technology. These projects aimed to enhance the curriculum for middle and elementary schools by incorporating VR interactive experiences. (One of them is still in development and has not been publicly disclosed yet)."
+        },
+        {
+            "position": "Intern",
+            "location": "Team 9",
+            "time": "Aug 2022 - Jul 2023",
+            "summary": "In my sophomore year, I began searching for internship opportunities with the goal of fully participating in the planning, development, and marketing processes of a game, in order to understand the challenges I might face in the future.<br>With the assistance of Team9, I continued to develop the project 'Antkeep,' which was an extension of my personal project from school. I delved deep into the enjoyment of game design, continuously prototyping and testing, and finally created a captivating game mechanism.<br>In the future, we plan to release 'Antkeep' on Steam as an early access title, allowing more people to play and test it."
+        },
+        {
+            "position": "Fullstack Programmer",
+            "location": "<a href='https://coding4fun.tw'>Coding for Fun</a>",
+            "time": "Feb 2020 - Aug 2020",
+            "summary": "The philosophy of Coding for Fun is to promote children's programming education through online courses combined with physical instructors, allowing children to grasp the course progress and providing timely assistance when they encounter difficulties in their studies.<br>The main job responsibilities include website development, server maintenance, which involves database management, RESTful API, user interface design, and more."
+        },
+        {
+            "position": "Game Programmer",
+            "location": "Buho Interactive",
+            "time": "Aug 2018 - Feb 2020",
+            "summary": "I worked at an independent game development company that primarily focused on mobile and computer game development.<br>During my tenure, I participated in three projects, gaining a deep understanding of the game development process. One of the projects, 'Chef Chen,' is currently available on Steam. I used Unity and Cocos Creator during the development of these projects."
+        },
+        {
+            "position": "Advanced High School Experimental Education (Home-Schooling)",
+            "location": "Education Department of New Taipei City",
+            "time": "Jul 2014 - Jun 2018",
+            "summary": "I began learning programming in junior high school, which ignited my passion for programming. Consequently, when I entered high school, I chose to be a self-learner, dedicating more time to studying programming. I delved into web development, learned Python and Javascript, and earned a nanodegree from Udacity."
+        }
+    ]
+}
