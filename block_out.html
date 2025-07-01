@@ -1,0 +1,90 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Document</title>
+
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        nav#navigation {
+            position: fixed;
+            z-index: 1000;
+            background-color: #333;
+            color: white;
+            padding: 10px;
+            border-radius: 10px;
+            top: 30px;
+            left: 40px;
+        }
+
+        nav#navigation ul {
+            list-style: none;
+            margin: 0;
+            padding: 0;
+            /* display: inline-block; */
+            /* padding: 10px 30px; */
+        }
+
+        nav#navigation ul li {
+            display: inline-block;
+            padding: 10px 30px;
+        }
+
+        nav#navigation ul li a {
+            text-decoration: none;
+            color: white;
+        }
+
+        section#entrance {
+            width: 100%;
+            height: 800px;
+            background-color: #4b4b4b;
+        }
+
+        section#projects {
+            width: 100%;
+            height: 800px;
+            background-color: #386cac;
+            padding: 20px;
+        }
+
+        section#projects article {
+            width: 100%;
+            height: 220px;
+            margin-bottom: 20px;
+            border-radius: 15px;
+            background-color: #2c65ac;
+        }
+    </style>
+</head>
+<body>
+    <nav id="navigation">
+        <ul>
+            <li><a href="index.html">Home</a></li>
+            <li><a href="block_out.html">Block Out</a></li>
+            <li><a href="test_vue.html">Test Vue</a></li>
+            <li><a href="test_data.html">Test Data</a></li>
+        </ul>
+    </nav>
+
+    <section id="entrance">
+        <h1>Michael Pan</h1>
+    </section>
+
+    <section id="projects">
+        <article>
+            <h3>Piano Tiles 2</h3>
+        </article>
+
+        <article>
+            <h3>Space Odyseey</h3>
+        </article>
+    </section>
+</body>
+</html>
