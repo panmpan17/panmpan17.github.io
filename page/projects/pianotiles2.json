@@ -1,9 +1,9 @@
 {
-    "id": "pianotiles2.json",
+    "id": "pianotiles2",
     "images": [],
     "summary": {
-        "en": "",
-        "zh": "Piano Tiles 2是一款節奏型音樂遊戲，玩家需隨著音樂節奏點擊下落的琴鍵，挑戰更高的分數並解鎖新歌曲。遊戲內收錄多種音樂風格，並支援多人競技模式，帶來極具挑戰性與趣味性的體驗。\n本專案橫跨各種平台開發，Google Play、iOS、Apple Arcade 等多個平台，使用C++開發。遊戲還有特別設計的多人連線遊玩，讓玩家可以合奏歌曲，提升趣味性。此外，還有動態載入歌曲的機制，讓遊戲能夠隨時擴充新的音樂內容，提升玩家的遊戲體驗。"
+        "en": "<TODO>",
+        "zh": "參與 Google Play Store 和 Apple iOS 平台版本開發，其中包含了全新多人連線遊戲模式、iOS Arcade + Google Play Pass 上架、Remote Dynamic Assets System、Cross Device Cloud Save、其他的遊戲模式開發。C++ 搭配 Objective-C 和 Java 開發，串接廣告SDK、IAP 流程以及資料收集等。"
     },
     "organization": "kooapps",
     "time": {
@@ -15,6 +15,17 @@
         "Java",
         "Objective-C",
         "Python"
+    ],
+    "platform": [
+        "Google Play / Play Pass",
+        "iOS / App Arcade",
+        "Amazon App Store"
+    ],
+    "tags": [
+        "Game",
+        "Mobile",
+        "Music",
+        "Multiplayer"
     ],
     "links": [
         

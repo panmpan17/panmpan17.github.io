@@ -1,0 +1,36 @@
+{
+    "id": "spaceodyssey",
+    "images": [],
+    "summary": {
+        "en": "<TODO>",
+        "zh": "3D 多人連線合作派對遊戲，4 人同心協力操作同一艘飛船，飛船 4 種崗位各有獨特機制和玩法。專案所有程式全部由我包辦，總共 5 萬多行的程式；得處理多人連線、機制平衡設計、物理計算、關卡安排、時程規劃等等挑戰，增加許多的技巧和經驗。"
+    },
+    "organization": "darkhotpot",
+    "time": {
+        "start": "2023-02",
+        "end": "2024-06"
+    },
+    "skills": [
+        "C#",
+        "Unity",
+        "NetCode"
+    ],
+    "tags": [
+        "Multiplayer",
+        "Party Game",
+        "FPS",
+        "Game Design"
+    ],
+    "platform": [
+        "Steam",
+        "itch.io",
+        "Windows",
+        "Linux",
+        "macOS"
+    ],
+    "links": [
+        [
+            "<TODO>"
+        ]
+    ]
+}
