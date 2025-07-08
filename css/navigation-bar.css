@@ -1,0 +1,41 @@
+nav#navigation {
+    position: fixed;
+    z-index: 1000;
+    background-color: #0000009e;
+    color: white;
+    padding: 10px;
+    border-radius: 10px;
+    top: 30px;
+    left: 40px;
+}
+
+nav#navigation ul {
+    list-style: none;
+    margin: 0;
+    padding: 0;
+}
+
+nav#navigation ul li {
+    display: inline-block;
+    padding: 10px 30px;
+    border-radius: 5px;
+    cursor: pointer;
+    background: rgba(47, 113, 255, 0);
+    transition: .08s;
+}
+
+nav#navigation ul li:hover {
+    background: rgba(47, 113, 255, 0.615);
+    transition: .05s;
+}
+
+nav#navigation ul li a {
+    font-size: 1.1em;
+    font-weight: 700;
+    text-decoration: none;
+    color: rgb(216, 216, 216);
+}
+
+nav#navigation ul li:hover a {
+    color: white
+}
