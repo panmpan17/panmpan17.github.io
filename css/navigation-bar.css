@@ -1,12 +1,13 @@
 nav#navigation {
     position: fixed;
     z-index: 1000;
-    background-color: #000000f5;
-    box-shadow: 0 0 10px rgba(0, 0, 0, 0.9);
+    /* background-color: #0C0A27; */
+    background: linear-gradient(to right, #0f0d32f5, #06050cf5);
+    box-shadow: 0 0 30px #310f4d;
     /* opacity: 0.7; */
     color: white;
     padding: 10px;
-    border-radius: 10px;
+    border-radius: 50px;
     top: 30px;
     left: 40px;
 }
@@ -20,15 +21,16 @@ nav#navigation ul {
 nav#navigation ul li {
     display: inline-block;
     padding: 10px 30px;
-    border-radius: 5px;
+    border-radius: 30px;
     cursor: pointer;
-    background: rgba(47, 113, 255, 0);
-    transition: .08s;
+    background: rgba(187, 36, 225, 0);
+    transition: .1s;
 }
 
 nav#navigation ul li:hover {
-    background: rgba(47, 113, 255, 0.615);
-    transition: .05s;
+    /* background: rgba(47, 113, 255, 0.615); */
+    background: rgba(187, 36, 225, 0.615);
+    transition: .15s;
 }
 
 nav#navigation ul li a {
@@ -58,6 +60,7 @@ nav#navigation ul li:hover a {
         width: 95%;
         left: 2.5%;
         top: 10px;
+        text-align: center;
     }
 
     nav#navigation ul li a {

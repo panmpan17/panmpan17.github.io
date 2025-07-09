@@ -3,6 +3,7 @@ section#projects {
     height: 800px;
     /* background-color: #386cac; */
     padding: 20px;
+    padding-top: 40px;
 }
 
 section#projects h2 {
@@ -12,6 +13,29 @@ section#projects h2 {
     margin-top: 30px;
     font-weight: 900;
 }
+
+section#projects #tags {
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: center;
+    margin-bottom: 30px;
+    user-select: none;
+}
+
+section#projects #tags div {
+    background: #C0C7D2;
+    color: white;
+    padding: 10px 40px;
+    border-radius: 30px;
+    margin: 0 5px;
+    cursor: pointer;
+}
+
+section#projects #tags div:hover { background: #a9b8d0; }
+section#projects #tags div:active { background: #8694aa; }
+section#projects #tags div.active { background: #3284CC; }
+section#projects #tags div.active:hover { background: #2071b8; }
+section#projects #tags div.active:active { background:rgb(24, 98, 163); }
 
 section#projects article {
     width: 100%;
@@ -36,19 +60,54 @@ section#projects article div.details {
     height: 100%;
     margin-left: 15px;
     padding: 20px;
-    background-color: #DBE9F6;
+    background-color: #619fd989;
     border-radius: 5px;
     vertical-align: top;
 }
 
+section#projects article div.details .container {
+    display: flex;
+}
+
+section#projects article div.details .container #icon {
+    margin-right: 20px;
+}
+
+section#projects article div.details #icon div {
+    width: 30px;
+    height: 30px;
+    border-radius: 50%;
+    margin-bottom: 8px;
+    background-color: #F0F4FB;
+}
 section#projects article div.details .title {
-    color: #5880D7;
+    color: #F0F4FB;
     font-weight: 900;
     margin-bottom: 10px;
+    font-size: 1.4em;
 }
 
 section#projects article div.details .description {
-    color: #81A1E1;
+    color: #E2E9F8;
     font-size: 14px;
     line-height: 1.5;
+}
+
+@media screen and (max-width: 768px) {
+    section#projects article div.thumbnail { border-radius: 10px; }
+    section#projects article div.thumbnail img { border-radius: 10px; }
+
+    section#projects article div.thumbnail {
+        width: 85%;
+        margin-left: 7.5%;
+        margin-bottom: 20px;
+        border-radius: 10px;
+    }
+
+    section#projects article div.details {
+        width: 90%;
+        margin-left: 5%;
+        margin-bottom: 20px;
+        border-radius: 10px;
+    }
 }

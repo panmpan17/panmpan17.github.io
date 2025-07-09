@@ -8,6 +8,7 @@
     <meta name="theme-color" content="#100D33" media="(prefers-color-scheme: light)">
     <meta name="theme-color" content="#100D33" media="(prefers-color-scheme: dark)">
 
+    <link rel="stylesheet" href="css/entrance.css">
     <link rel="stylesheet" href="css/navigation-bar.css">
     <link rel="stylesheet" href="css/project-card.css">
 
@@ -25,92 +26,32 @@
             width: 100%;
             z-index: -999;
             background-image: url("images/background.png");
-            background-size: cover;;
-        }
+            background-size: 200%;
+            background-position: center;
 
-        section#entrance {
-            width: 100%;
-            height: 800px;
-            /* background-color: #4b4b4b; */
-        }
-
-        section#entrance #introduction {
-            width: 35%;
-            padding-top: 200px;
-            padding-left: 10px;
-            padding-right: 10px;
+            /* background-size: cover;
+            filter: brightness(0.7); */
             
-            text-align: center  ;
+            background-size: 150%;
+            filter: brightness(1);
+            animation: backgroundAnimation 2s forwards;
+            animation-delay: 0.5s;
         }
 
-        section#entrance #introduction #head-img {
-            margin: auto;
-            width: 150px;
-            height: 150px;
-            overflow: hidden;
-        }
-
-        section#entrance #introduction #head-img img {
-            width: 100%;
-            height: 100%;
-            object-fit: cover;
-            border-radius: 50%;
-        }
-
-        section#entrance #introduction #name {
-            font-size: 1.5rem;
-            color: #ffffff;
-            margin-top: 20px;
-        }
-
-        section#entrance #introduction p {
-            color: #ffffff;
-            font-size: 1rem;
-            margin-top: 20px;
-            line-height: 1.2rem;
-            text-align: justify;
-        }
-
-        section#entrance #video {
-            display: inline-block;
-            width: 60%;
-            height: 100%;
-            text-align: center;
-        }
-
-        section#entrance #video iframe {
-            width: 100%;
-            height: 100%;
-            border: none;
-        }
-
-        @media screen and (max-width: 768px) {
-            section#entrance #introduction {
-                width: 100%;
-                padding-top: 100px;;
+        @keyframes backgroundAnimation {
+            0% {
+                background-size: 150%;
+                filter: brightness(1);
             }
-
-            section#entrance #introduction #head-img {
-                width: 200px;
-                height: 200px;
+            99% {
+                background-size: 100%;
+                filter: brightness(0.7);
             }
-
-            section#entrance #introduction #name {
-                font-size: 2rem;
-            }
-
-            section#entrance #introduction p {
-                padding: 0 20px;
-            }
-
-            section#entrance #video {
-                width: 100%;
-                height: 400px;
-                padding: 30px;
+            100% {
+                background-size: cover;
+                filter: brightness(0.7);
             }
         }
-
-        /* section#entrance #head-img  */
     </style>
 </head>
 <body>
@@ -127,9 +68,10 @@
     <section id="entrance">
         <div id="introduction">
             <div id="head-img">
-                <img src="/images/project_slime.jpeg" alt="">
+                <img src="/images/head.jpg" alt="">
             </div>
             <h1 id="name">Michael Pan</h1>
+            <h3 id="job">Game Programmer</h3>
 
             <p>
                 Lorem ipsum dolor sit amet, consectetur adipiscing elit. 
@@ -147,19 +89,33 @@
 
     <section id="projects">
         <h2>Project</h2>
+        <div id="tags">
+            <div>C++</div>
+            <div class="active">Python</div>
+        </div>
+
         <article>
             <div class="thumbnail">
                 <img src="images/project_antkeep.jpeg" alt="">
             </div>
             <div class="details">
-                <h3 class="title">Ant Keep</h3>
+                <div class="container">
+                    <div id="icon">
+                        <div></div>
+                        <div></div>
+                        <div></div>
+                    </div>
+                    <div id="text">
+                        <h3 class="title">Ant Keep</h3>
 
-                <div class="description">
-                    Lorem ipsum dolor sit amet, consectetur adipiscing elit. 
-                    Sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. 
-                    Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat. 
-                    Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur. 
-                    Excepteur sint occaecat cupidatat non proident, sunt in culpa qui officia deserunt mollit anim id est laborum.
+                        <div class="description">
+                            Lorem ipsum dolor sit amet, consectetur adipiscing elit. 
+                            Sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. 
+                            Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat. 
+                            Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur. 
+                            Excepteur sint occaecat cupidatat non proident, sunt in culpa qui officia deserunt mollit anim id est laborum.
+                        </div>
+                    </div>
                 </div>
             </div>
         </article>
