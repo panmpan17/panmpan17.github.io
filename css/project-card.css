@@ -12,6 +12,7 @@ section#projects h2 {
     margin-bottom: 20px;
     margin-top: 30px;
     font-weight: 900;
+    font-size: 1.4em;
 }
 
 section#projects #tags {
@@ -23,6 +24,7 @@ section#projects #tags {
 }
 
 section#projects #tags div {
+    font-size: 1em;
     background: #C0C7D2;
     color: white;
     padding: 10px 40px;
@@ -61,6 +63,7 @@ section#projects article div.details {
     margin-left: 15px;
     padding: 20px;
     background-color: #619fd989;
+    box-shadow: 0 0 5px #619fd97a;
     border-radius: 5px;
     vertical-align: top;
 }
@@ -91,23 +94,49 @@ section#projects article div.details .description {
     color: #E2E9F8;
     font-size: 14px;
     line-height: 1.5;
+    text-align: justify;
 }
 
 @media screen and (max-width: 768px) {
+    section#projects #tags div {
+        font-size: 0.7em;
+        padding: 6px 12px;
+    }
+
     section#projects article div.thumbnail { border-radius: 10px; }
     section#projects article div.thumbnail img { border-radius: 10px; }
 
     section#projects article div.thumbnail {
-        width: 85%;
-        margin-left: 7.5%;
-        margin-bottom: 20px;
+        position: relative;
+        width: 97%;
+        margin-left: 1.5%;
+        margin-bottom: 0;
         border-radius: 10px;
+        z-index: 100;
+        /* box-shadow: 0 0px 6px rgb(0, 0, 0); */
+    }
+
+    section#projects article div.thumbnail img {
+        box-shadow: 0 0px 6px rgb(0, 0, 0);
     }
 
     section#projects article div.details {
+        position: relative;
+        z-index: 99;
         width: 90%;
         margin-left: 5%;
         margin-bottom: 20px;
+        margin-top: -10px;
+        padding-top: 23px;
         border-radius: 10px;
+        border-top-left-radius: 0;
+        border-top-right-radius: 0;
+    }
+    section#projects article div.details .title {
+        font-size: 1.1em;
+    }
+
+    section#projects article div.details .description {
+        font-size: 0.8em;
     }
 }

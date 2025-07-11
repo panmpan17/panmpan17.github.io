@@ -45,27 +45,36 @@ nav#navigation ul li:hover a {
 }
 
 
-/* X-Small */
-@media screen and (max-width: 576px) {
-}
-
-/* Small */
-@media screen and (max-width: 768px) and (min-width: 576px) {
-}
-
 /* Small and X-Small */
 @media screen and (max-width: 768px) {
     nav#navigation {
         /* background-color: #c1c1c19e; */
         width: 95%;
         left: 2.5%;
-        top: 10px;
+        top: 7px;
+        padding: 7px;
         text-align: center;
+    }
+
+    nav#navigation ul li {
+        padding: 4px 12px;
     }
 
     nav#navigation ul li a {
         font-size: 0.9em;
     }
+}
+
+/* X-Small */
+@media screen and (max-width: 576px) {
+    nav#navigation ul li a {
+        font-size: 0.7em;
+        padding: 3px 8px;
+    }
+}
+
+/* Small */
+@media screen and (max-width: 768px) and (min-width: 576px) {
 }
 
 /* Large */
