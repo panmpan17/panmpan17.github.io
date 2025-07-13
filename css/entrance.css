@@ -66,6 +66,32 @@ section#entrance #introduction p {
     text-align: justify;
 }
 
+section#entrance #introduction #links {
+    margin-top: 15px;
+}
+
+section#entrance #introduction #links a {
+    display: inline-block;
+    width: 40px;
+    height: 40px;
+    line-height: 40px;
+    margin: 10px 5px;
+    border-radius: 50%;
+    background-color: #ffffff;
+    color: #1c1256;
+    text-decoration: none;
+    font-size: 1.2rem;
+}
+
+section#entrance #introduction #links a:hover {
+    background-color: #5743c8;
+    color: #ffffff;
+}
+section#entrance #introduction #links a:active {
+    background-color: #2c1f76;
+    color: #ffffff;
+}
+
 section#entrance #video {
     display: inline-block;
     position: relative;

@@ -6,15 +6,6 @@ section#projects {
     padding-top: 40px;
 }
 
-section#projects h2 {
-    color: white;
-    text-align: center;
-    margin-bottom: 20px;
-    margin-top: 30px;
-    font-weight: 900;
-    font-size: 1.4em;
-}
-
 section#projects #tags {
     display: flex;
     flex-wrap: wrap;
@@ -79,6 +70,8 @@ section#projects article div.details .container #icon {
 section#projects article div.details #icon div {
     width: 30px;
     height: 30px;
+    line-height: 30px;
+    text-align: center;
     border-radius: 50%;
     margin-bottom: 8px;
     background-color: #F0F4FB;
