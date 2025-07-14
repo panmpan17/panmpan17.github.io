@@ -32,10 +32,18 @@
         }
 
         section#experiences {
-            padding: 8%;
+            padding: 12%;
+        }
+
+        section#experiences article {
+            display: flex;
+            align-items: flex-start;
+            margin-bottom: 25px;
         }
 
         section#experiences article .description {
+            width: 70%;
+            margin-right: 40px;
             display: flex;
             align-items: flex-start;
         }
@@ -76,6 +84,43 @@
 
         section#experiences article .description .summary p {
             text-align: justify;
+        }
+
+        section#experiences article .linked-progects {
+            display: inline-block;
+            width: 25%;
+        }
+
+        section#experiences article .linked-progects img {
+            width: 100%;
+            height: auto;
+            border-radius: 10px;
+        }
+
+        @media screen and (max-width: 768px) {
+            section#experiences {
+                padding: 4%;
+            }
+
+            section#experiences article {
+                flex-direction: column;
+            }
+
+            section#experiences article .description {
+                width: 100%;
+                margin-right: 0;
+                margin-bottom: 20px;
+            }
+
+            section#experiences article .linked-progects {
+                width: 100%;
+                margin-bottom: 20px;
+            }
+
+            section#experiences article .linked-progects img {
+                width: 33%;
+                height: auto;
+            }
         }
 
         #entire-page-background {
@@ -153,6 +198,7 @@
 
     <section id="experiences">
         <h2 class="title">Experiences</h2>
+
         <article>
             <div class="description">
                 <div class="icon" style="background: white;">
@@ -172,8 +218,33 @@
                 </div>
             </div>
 
-            <div class="image-container">
-                <!-- <img src="images/experience_1.jpg" alt=""> -->
+            <div class="linked-progects">
+                <img src="images/project_antkeep.jpeg" alt="">
+            </div>
+        </article>
+
+
+        <article>
+            <div class="description">
+                <div class="icon" style="background: white;">
+                    <img src="images/kooapps.png" alt="">
+                </div>
+
+                <div class="summary">
+                    <h4>Kooapps</h4>
+                    <time>Jul 2024 - Present</time>
+                    <h5>Game Programmer</h5>
+
+                    <p>
+                        Lorem ipsum dolor sit amet, consectetur adipiscing elit. 
+                        Sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. 
+                        Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat.
+                    </p>
+                </div>
+            </div>
+
+            <div class="linked-progects">
+                <img src="images/project_antkeep.jpeg" alt="">
             </div>
         </article>
     </section>
@@ -184,6 +255,59 @@
             <div>C++</div>
             <div class="active">Python</div>
         </div>
+
+        <article>
+            <div class="thumbnail">
+                <img src="images/project_antkeep.jpeg" alt="">
+            </div>
+            <div class="details">
+                <div class="container">
+                    <div id="icon">
+                        <div>
+                            <i class="fab fa-python"></i>
+                        </div>
+                        <div>
+                            <i class="fab fa-html5"></i>
+                        </div>
+                        <div>
+                            <i class="fab fa-unity"></i>
+                        </div>
+                        <div>
+                            <i class="fab fa-swift"></i>
+                        </div>
+                        <div>
+                            <i class="fab fa-app-store-ios"></i>
+                        </div>
+                        <div>
+                            <i class="fab fa-apple"></i>
+                        </div>
+                        <div>
+                            <i class="fab fa-google-play"></i>
+                        </div>
+                        <div>
+                            <i class="fab fa-android"></i>
+                        </div>
+                        <div>
+                            <i class="fab fa-js-square"></i>
+                        </div>
+                        <div>
+                            <i class="fab fa-java"></i>
+                        </div>
+                    </div>
+                    <div id="text">
+                        <h3 class="title">Ant Keep</h3>
+
+                        <div class="description">
+                            Lorem ipsum dolor sit amet, consectetur adipiscing elit. 
+                            Sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. 
+                            Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat. 
+                            Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur. 
+                            Excepteur sint occaecat cupidatat non proident, sunt in culpa qui officia deserunt mollit anim id est laborum.
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </article>
 
         <article>
             <div class="thumbnail">

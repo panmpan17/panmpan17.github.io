@@ -32,6 +32,7 @@ section#projects #tags div.active:active { background:rgb(24, 98, 163); }
 
 section#projects article {
     width: 100%;
+    margin-bottom: 20px;
 }
 
 section#projects article div.thumbnail {
