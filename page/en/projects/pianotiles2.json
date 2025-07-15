@@ -1,0 +1,30 @@
+{
+    "id": "pianotiles2",
+    "images": [],
+    "summary": "<TODO>",
+    "organization": "kooapps",
+    "time": {
+        "start": "2024-07",
+        "end": ""
+    },
+    "skills": [
+        "C++",
+        "Java",
+        "Objective-C",
+        "Python"
+    ],
+    "platform": [
+        "Google Play / Play Pass",
+        "iOS / App Arcade",
+        "Amazon App Store"
+    ],
+    "tags": [
+        "Game",
+        "Mobile",
+        "Music",
+        "Multiplayer"
+    ],
+    "links": [
+        
+    ]
+}

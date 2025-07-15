@@ -1,0 +1,33 @@
+{
+    "id": "spaceodyssey",
+    "images": [],
+    "summary": "<TODO>",
+    "organization": "darkhotpot",
+    "time": {
+        "start": "2023-02",
+        "end": "2024-06"
+    },
+    "skills": [
+        "C#",
+        "Unity",
+        "NetCode"
+    ],
+    "tags": [
+        "Multiplayer",
+        "Party Game",
+        "FPS",
+        "Game Design"
+    ],
+    "platform": [
+        "Steam",
+        "itch.io",
+        "Windows",
+        "Linux",
+        "macOS"
+    ],
+    "links": [
+        [
+            "<TODO>"
+        ]
+    ]
+}

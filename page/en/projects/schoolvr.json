@@ -1,0 +1,28 @@
+{
+    "id": "schoolvr",
+    "images": [],
+    "summary": "<TODO>",
+    "organization": "tatung",
+    "time": {
+        "start": "2020-12",
+        "end": "2024-02"
+    },
+    "skills": [
+        "C#",
+        "Unity",
+        "VR"
+    ],
+    "platform": [
+        "Vive Focus 3/1",
+        "Oculus Quest 2",
+        "Vive Pro",
+        "Cartboard VR"
+    ],
+    "tags": [
+        "Game",
+        "Education"
+    ],
+    "links": [
+        
+    ]
+}

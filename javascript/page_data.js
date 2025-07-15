@@ -21,32 +21,32 @@ const PROJECT_IDS = [
             return self.pageData;
         };
 
+        this.language = ref("zh");
+
         this.loadOrganizationData = function() {
-            for (let i = 0; i < ORGANIZATION_IDS.length; i++) {
-                let id = ORGANIZATION_IDS[i];
+            for (let id of ORGANIZATION_IDS) {
                 Get({
-                    url: `/page/organizations/${id}.json`,
+                    url: `/page/${self.language.value}/organizations/${id}.json`,
                     success: (response) => {
-                        // organizations[id] = response.jsonlizeText();
+                        organizations.value[id] = response.jsonlizeText();
                     }
                 });
             }
         }
 
         this.loadProjectData = function() {
-            for (let i = 0; i < PROJECT_IDS.length; i++) {
-                let id = PROJECT_IDS[i];
+            for (let id of PROJECT_IDS) {
                 Get({
-                    url: `/page/projects/${id}.json`,
+                    url: `/page/${self.language.value}/projects/${id}.json`,
                     success: (response) => {
-                        // projects[id] = response.jsonlizeText();
+                        projects.value[id] = response.jsonlizeText();
                     }
                 });
             }
         }
 
         this.loadGeneralData = function() {
-            let generalJsonUrl = "/page/general.json";
+            let generalJsonUrl = `/page/${self.language.value}/general.json`;
             Get({
                 url: generalJsonUrl,
                 success: (response) => { self.pageData.general.value = response.jsonlizeText(); },
