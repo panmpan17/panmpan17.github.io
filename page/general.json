@@ -1,0 +1,17 @@
+{
+    "navigation": {
+        "top": "Intro",
+        "experiences": "Experiences",
+        "projects": "Projects"
+    },
+    "intro": {
+        "name": "Michael Pan",
+        "job": "Game Programmer"
+    },
+    "experiences": {
+        "title": "Experiences"
+    },
+    "projects": {
+        "title": "Projects"
+    }
+}

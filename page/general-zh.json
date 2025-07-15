@@ -1,0 +1,17 @@
+{
+    "navigation": {
+        "top": "簡介",
+        "experiences": "經歷",
+        "projects": "專案"
+    },
+    "intro": {
+        "name": "潘啟元 Michael Pan",
+        "job": "遊戲工程師"
+    },
+    "experiences": {
+        "title": "經歷"
+    },
+    "projects": {
+        "title": "專案"
+    }
+}
