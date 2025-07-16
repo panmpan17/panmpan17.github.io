@@ -64,6 +64,25 @@
 
     <section id="experiences">
         <h2 class="title">{{ general.experiences?.title ?? "Experiences" }}</h2>
+
+        <article v-for="org in sortedOrganizations">
+            <div class="description">
+                <div class="icon" style="background: white;">
+                    <img src="images/kooapps.png" alt="">
+                </div>
+
+                <div class="summary">
+                    <h4>{{ org.name }}</h4>
+                    <time>{{ org.time.start }} ~ {{ org.time.end }}</time>
+                    <h5>{{ org.job_title }} </h5>
+                    <p>{{ org.summary }}</p>
+                </div>
+            </div>
+
+            <div class="linked-progects">
+                <img src="images/project_antkeep.jpeg" alt="">
+            </div>
+        </article>
     </section>
 
     <section id="projects">
@@ -72,6 +91,25 @@
             <div>C++</div>
             <div class="active">Python</div>
         </div>
+
+        <article v-for="project in sortedProjects">
+            <div class="thumbnail">
+                <img src="images/project_antkeep.jpeg" alt="">
+            </div>
+            <div class="details">
+                <div class="container">
+                    <div id="icon">
+                        <div>
+                            <i class="fab fa-python"></i>
+                        </div>
+                    </div>
+                    <div id="text">
+                        <h3 class="title">{{ project.name }}</h3>
+                        <div class="description">{{ project.summary }}</div>
+                    </div>
+                </div>
+            </div>
+        </article>
     </section>
 
 

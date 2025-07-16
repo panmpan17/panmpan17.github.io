@@ -1,5 +1,6 @@
 {
     "id": "pianotiles2",
+    "name": "Piano Tiles 2",
     "images": [],
     "summary": "參與 Google Play Store 和 Apple iOS 平台版本開發，其中包含了全新多人連線遊戲模式、iOS Arcade + Google Play Pass 上架、Remote Dynamic Assets System、Cross Device Cloud Save、其他的遊戲模式開發。C++ 搭配 Objective-C 和 Java 開發，串接廣告SDK、IAP 流程以及資料收集等。",
     "organization": "kooapps",
@@ -26,5 +27,6 @@
     ],
     "links": [
         
-    ]
+    ],
+    "order": 1000
 }

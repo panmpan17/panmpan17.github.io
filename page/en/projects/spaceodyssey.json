@@ -1,5 +1,6 @@
 {
     "id": "spaceodyssey",
+    "name": "Space Odyssey",
     "images": [],
     "summary": "<TODO>",
     "organization": "darkhotpot",
@@ -29,5 +30,6 @@
         [
             "<TODO>"
         ]
-    ]
+    ],
+    "order": 900
 }

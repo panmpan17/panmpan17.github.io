@@ -1,13 +1,16 @@
 const ORGANIZATION_IDS = [
     "kooapps",
+    "darkhotpot"
 ];
 
 const PROJECT_IDS = [
     "pianotiles2",
+    "spaceodyssey",
+    "schoolvr",
 ];
 
 (function () {
-    const { createApp, ref } = Vue;
+    const { createApp, ref, computed } = Vue;
 
     function View() {
         let self = this;
@@ -15,6 +18,21 @@ const PROJECT_IDS = [
         this.pageData = {
             general: ref({}),
             projects: ref({}),
+            organizations: ref({}),
+
+            sortedProjects: computed (() => {
+                // TODO: add tag filtering
+                return Object.values(self.pageData.projects.value).sort((a, b) => {
+                    return b.order - a.order; // Descending order
+                });
+            }),
+            sortedOrganizations: computed (() => {
+                return Object.values(self.pageData.organizations.value).sort((a, b) => {
+                    return b.order - a.order; // Descending order
+                }).filter(org => {
+                    return org.display;
+                });
+            }),
         }
 
         this.data = function () {
@@ -28,7 +46,7 @@ const PROJECT_IDS = [
                 Get({
                     url: `/page/${self.language.value}/organizations/${id}.json`,
                     success: (response) => {
-                        organizations.value[id] = response.jsonlizeText();
+                        self.pageData.organizations.value[id] = response.jsonlizeText();
                     }
                 });
             }
@@ -39,7 +57,7 @@ const PROJECT_IDS = [
                 Get({
                     url: `/page/${self.language.value}/projects/${id}.json`,
                     success: (response) => {
-                        projects.value[id] = response.jsonlizeText();
+                        self.pageData.projects.value[id] = response.jsonlizeText();
                     }
                 });
             }

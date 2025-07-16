@@ -1,5 +1,6 @@
 {
     "id": "pianotiles2",
+    "name": "Piano Tiles 2",
     "images": [],
     "summary": "<TODO>",
     "organization": "kooapps",
@@ -26,5 +27,6 @@
     ],
     "links": [
         
-    ]
+    ],
+    "order": 1000
 }

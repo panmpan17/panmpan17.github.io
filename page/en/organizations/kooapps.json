@@ -1,10 +1,12 @@
 {
     "id": "kooapps",
     "name": "Kooapps",
+    "job_title": "Game Programmer",
     "time": {
-        "start": "2024-07",
-        "end": ""
+        "start": "2024/07",
+        "end": "Present"
     },
     "summary": "A multinational game company headquartered in the United States, with development teams based in Taiwan and the Philippines. English is the primary language for internal communication, including meetings and technical documentation. The company’s flagship title, Piano Tiles 2, has surpassed 10 million downloads worldwide and maintains over 100,000 daily active users. Cross-platform development is primarily done using C++.\n\nParticipated in the development of the Google Play Store and Apple iOS versions, which included implementing a brand-new multiplayer game mode, publishing to Apple Arcade and Google Play Pass, building a Remote Dynamic Assets System, Cross-Device Cloud Save, and other gameplay modes. Development was done using C++ in combination with Objective-C and Java, and involved integration of ad SDKs, in-app purchase (IAP) flows, and data collection systems.",
-    "display": true
+    "display": true,
+    "order": 1000
 }
