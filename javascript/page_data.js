@@ -33,7 +33,21 @@ const PROJECT_IDS = [
                     return org.display;
                 });
             }),
-        }
+
+            changeLanguage: function () {
+                if (self.language.value === "zh") {
+                    self.language.value = "en";
+                }
+                else {
+                    self.language.value = "zh";
+                }
+                self.loadGeneralData();
+                self.loadOrganizationData();
+                self.loadProjectData();
+            }
+        };
+
+        this.langaugesData = {};
 
         this.data = function () {
             return self.pageData;
@@ -42,32 +56,72 @@ const PROJECT_IDS = [
         this.language = ref("zh");
 
         this.loadOrganizationData = function() {
+            let language = self.language.value;
+            if (self.langaugesData[language] == undefined) {
+                self.langaugesData[language] = { organizations: {} };
+            }
+            else if (self.langaugesData[language].organizations == undefined) {
+                self.langaugesData[language].organizations = {};
+            }
+
             for (let id of ORGANIZATION_IDS) {
+                if (self.langaugesData[language].organizations[id]) {
+                    self.pageData.organizations.value[id] = self.langaugesData[language].organizations[id];
+                    continue;
+                }
+
                 Get({
                     url: `/page/${self.language.value}/organizations/${id}.json`,
                     success: (response) => {
-                        self.pageData.organizations.value[id] = response.jsonlizeText();
+                        self.langaugesData[language].organizations[id] = response.jsonlizeText();
+                        self.pageData.organizations.value[id] = self.langaugesData[language].organizations[id];
                     }
                 });
             }
         }
 
         this.loadProjectData = function() {
+            let language = self.language.value;
+            if (self.langaugesData[language] == undefined) {
+                self.langaugesData[language] = { projects: {} };
+            }
+            else if (self.langaugesData[language].projects == undefined) {
+                self.langaugesData[language].projects = {};
+            }
+
             for (let id of PROJECT_IDS) {
+                if (self.langaugesData[language].projects[id]) {
+                    self.pageData.projects.value[id] = self.langaugesData[language].projects[id];
+                    continue;
+                }
+
                 Get({
-                    url: `/page/${self.language.value}/projects/${id}.json`,
+                    url: `/page/${language}/projects/${id}.json`,
                     success: (response) => {
-                        self.pageData.projects.value[id] = response.jsonlizeText();
+                        self.langaugesData[language].projects[id] = response.jsonlizeText();
+                        self.pageData.projects.value[id] = self.langaugesData[language].projects[id];
                     }
                 });
             }
         }
 
         this.loadGeneralData = function() {
-            let generalJsonUrl = `/page/${self.language.value}/general.json`;
+            let language = self.language.value;
+            if (self.langaugesData[language] == undefined) {
+                self.langaugesData[language] = {};
+            }
+            else if (self.langaugesData[language].general) {
+                self.pageData.general.value = self.langaugesData[language].general;
+                return;
+            }
+
+            let generalJsonUrl = `/page/${language}/general.json`;
             Get({
                 url: generalJsonUrl,
-                success: (response) => { self.pageData.general.value = response.jsonlizeText(); },
+                success: (response) => {
+                    self.langaugesData[language].general = response.jsonlizeText();
+                    self.pageData.general.value = self.langaugesData[language].general;
+                },
             });
         }
 
