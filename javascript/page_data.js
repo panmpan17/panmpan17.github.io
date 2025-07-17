@@ -6,7 +6,7 @@ const ORGANIZATION_IDS = [
 const PROJECT_IDS = [
     "pianotiles2",
     "spaceodyssey",
-    "schoolvr",
+    // "schoolvr",
 ];
 
 (function () {
@@ -19,6 +19,21 @@ const PROJECT_IDS = [
             general: ref({}),
             projects: ref({}),
             organizations: ref({}),
+
+            getPlatformIcon: function (platform) {
+                switch (platform) {
+                    case "Steam":
+                        return "fab fa-steam";
+                    case "Google Play":
+                        return "fab fa-google-play";
+                    case "App Store":
+                        return "fab fa-apple";
+                    case "itch.io":
+                        return "fab fa-itch-io";
+                    default:
+                        return "fas fa-link";
+                }
+            },
 
             sortedProjects: computed (() => {
                 // TODO: add tag filtering

@@ -91,6 +91,15 @@ section#projects article div.details .description {
     text-align: justify;
 }
 
+section#projects article div.details a {
+    display: block;
+    padding-top: 8px;
+    color: rgb(101, 206, 255);
+    text-decoration: none;
+}
+section#projects article div.details a:hover { color: rgb(79, 182, 231); }
+section#projects article div.details a:active { color: rgb(58, 158, 201); }
+
 @media screen and (max-width: 768px) {
     section#projects #tags div {
         font-size: 0.7em;

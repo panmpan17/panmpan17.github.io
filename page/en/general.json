@@ -6,7 +6,8 @@
     },
     "intro": {
         "name": "Michael Pan",
-        "job": "Game Programmer"
+        "job": "Game Programmer",
+        "about": "<TODO>"
     },
     "experiences": {
         "title": "Experiences"

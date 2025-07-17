@@ -1,7 +1,11 @@
 {
     "id": "pianotiles2",
     "name": "Piano Tiles 2",
-    "images": [],
+    "images": [
+        "/images/piano_tiles/1.jpg",
+        "/images/piano_tiles/2.jpg",
+        "/images/piano_tiles/3.jpg"
+    ],
     "summary": "<TODO>",
     "organization": "kooapps",
     "time": {
@@ -25,8 +29,9 @@
         "Music",
         "Multiplayer"
     ],
-    "links": [
-        
-    ],
+    "links": {
+        "App Store": "https://apps.apple.com/us/app/piano-tiles-2-fun-piano-game/id1027688889",
+        "Google Play": "https://play.google.com/store/apps/details?id=com.kooapps.pianotiles2gp"
+    },
     "order": 1000
 }
