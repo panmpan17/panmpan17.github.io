@@ -9,10 +9,12 @@ const PROJECT_IDS = [
     // "schoolvr",
 ];
 
+const userLanguage = (navigator.language || navigator.userLanguage).toLowerCase();
+
 (function () {
     const { createApp, ref, computed } = Vue;
 
-    function View() {
+    function View(defaultLanguage) {
         let self = this;
 
         this.pageData = {
@@ -68,7 +70,7 @@ const PROJECT_IDS = [
             return self.pageData;
         };
 
-        this.language = ref("zh");
+        this.language = ref(defaultLanguage);
 
         this.loadOrganizationData = function() {
             let language = self.language.value;
@@ -145,6 +147,13 @@ const PROJECT_IDS = [
         this.loadProjectData();
     }
 
-    let app = createApp(new View());
+    let defaultLanguage;
+    if (userLanguage.startsWith("zh")) {
+        defaultLanguage = "zh";
+    }
+    else {
+        defaultLanguage = "en";
+    }
+    let app = createApp(new View(defaultLanguage));
     app.mount("body");
 })();
