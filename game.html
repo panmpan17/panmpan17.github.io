@@ -1,0 +1,168 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Document</title>
+    
+    <style>
+        body {
+            background-color: #bababa;
+
+        }
+        canvas#gameCanvas {
+            /* background-color: #f0f0f0; */
+            display: block;
+            margin: 0 auto;
+            border: 1px solid black;
+        }
+    </style>
+</head>
+<body>
+    <canvas id="gameCanvas" width="800" height="600"></canvas>
+
+    <script>
+        let images = {};
+        let FPS = 60;
+
+        function loadImage(name, src) {
+            return new Promise((resolve, reject) => {
+                images[name] = new Image();
+                images[name].src = src;
+                images[name].onload = () => {
+                    resolve(images[name]);
+                };
+                images[name].onerror = () => reject(new Error(`Failed to load image: ${src}`));
+            });
+        }
+
+        function drawCircle(context, x, y, radius, color) {
+            context.fillStyle = color;
+            context.beginPath();
+            context.arc(x, y, radius, 0, Math.PI * 2);
+            context.fill();
+        }
+
+        class SimpleImageNode {
+            constructor({image, x, y, scale}) {
+                this.image = image;
+                this.x = x;
+                this.y = y;
+                this.scale = scale || 1;
+            }
+
+            update(gameCanvas, deltaTime) {}
+
+            draw(gameCanvas) {
+                let width = this.image.width * this.scale;
+                let height = this.image.height * this.scale;
+                gameCanvas.context.drawImage(this.image, this.x - width / 2, this.y - height / 2, width, height);
+
+                // drawCircle(gameCanvas.context, this.x, this.y + 100, 5, 'red');
+            }
+        }
+
+        class Ship extends SimpleImageNode {
+            constructor(x, y) {
+                super({ image: images.ship, x, y, scale: 0.8 });
+
+                this.velocityX = 0;
+                this.velocityY = 0;
+                this.mouseDown = false;
+            }
+
+            update(gameCanvas, deltaTime) {
+            }
+
+            draw(gameCanvas) {
+                super.draw(gameCanvas);
+
+                if (gameCanvas.mouseInFrame) {
+                    drawCircle(gameCanvas.context, gameCanvas.mousePositionX, gameCanvas.mousePositionY, 5, 'red');  
+                }
+            }
+        }
+
+        class GameCanvas {
+            constructor() {
+                this.canvas = document.getElementById('gameCanvas');
+                this.context = this.canvas.getContext('2d');
+
+                this.canvas.addEventListener('mousedown', this.onMouseDown.bind(this));
+                this.canvas.addEventListener('mouseup', this.onMouseUp.bind(this));
+                this.canvas.addEventListener('mousemove', this.onMouseMove.bind(this));
+                this.canvas.addEventListener('mouseenter', this.onMouseEnter.bind(this));
+                this.canvas.addEventListener('mouseleave', this.onMouseLeave.bind(this));
+
+
+                this.mouseInFrame = false;
+                this.mousePositionX = 0;
+                this.mousePositionY = 0;
+                this.mouseDown = false;
+
+                this.lastTime = null;
+
+                this.children = [
+                    new Ship(this.canvas.width / 2, this.canvas.height / 2),
+                ];
+            }
+
+            start() {
+                this.lastTime = Date.now();
+                setInterval(() => {
+                    this.update();
+                    this.context.clearRect(0, 0, this.canvas.width, this.canvas.height);
+                    for (let i = 0; i < this.children.length; i++) {
+                        this.children[i].draw(this);
+                    }
+                }, 1000 / FPS);
+            }
+
+            update() {
+                // Update game state
+                let now = Date.now();
+                let deltaTime = (now - this.lastTime) / 1000; // Convert
+                
+                for (let i = 0; i < this.children.length; i++) {
+                    this.children[i].update(this, deltaTime);
+                }
+
+                this.lastTime = now;
+            }
+
+            onMouseEnter(event) {
+                this.mouseInFrame = true;
+            }
+            onMouseLeave(event) {
+                this.mouseInFrame = false;
+            }
+            onMouseDown(event) {
+                this.mouseDown = true;
+            }
+            onMouseUp(event) {
+                this.mouseDown = false;
+                
+            }
+            onMouseMove(event) {
+                this.mousePositionX = event.offsetX;
+                this.mousePositionY = event.offsetY;
+            }
+        }
+
+        (function() {
+
+            // Load images
+            Promise.all([
+                loadImage('ship', '/images/game/ship.png'),
+                // Add more images as needed
+            ]).then(() => {
+                console.log('All images loaded successfully');
+                var gameCanvas = new GameCanvas();
+                gameCanvas.start();
+            }).catch(error => {
+                console.error(error);
+            });
+        })();
+    </script>
+</body>
+</html>
