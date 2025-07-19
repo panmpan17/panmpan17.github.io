@@ -6,7 +6,13 @@
         "start": "2024/07",
         "end": "現職"
     },
-    "summary": "外商遊戲公司，總部位於美國，在台灣與菲律賓設有研發據點，內部以英語為主要溝通語言，包含會議與技術文件皆採全英文環境。公司代表作為《Piano Tiles 2》，全球下載突破千萬，日活躍用戶超過十萬，主要使用 C++ 來做跨平台的開發。\n\n參與 Google Play Store 和 Apple iOS 平台版本開發，其中包含了全新多人連線遊戲模式、iOS Arcade + Google Play Pass 上架、Remote Dynamic Assets System、Cross Device Cloud Save、其他的遊戲模式開發。C++ 搭配 Objective-C 和 Java 開發，串接廣告SDK、IAP 流程以及資料收集等。",
+    "summary": "外商遊戲公司，總部位於美國，在台灣與菲律賓設有研發據點，內部以英語為主要溝通語言，包含會議與技術文件皆採全英文環境。公司代表作為《Piano Tiles 2》，全球下載突破千萬，日活躍用戶超過十萬，主要使用 C++ 來做跨平台的開發。<br><br>參與 Google Play Store 和 Apple iOS 平台版本開發，其中包含了全新多人連線遊戲模式、iOS Arcade + Google Play Pass 上架、Remote Dynamic Assets System、Cross Device Cloud Save、其他的遊戲模式開發。C++ 搭配 Objective-C 和 Java 開發，串接廣告SDK、IAP 流程以及資料收集等。",
+    "logo": "/images/kooapps.png",
+    "linked_projects": [
+        "/images/piano_tiles/1.jpg",
+        "/images/piano_tiles/2.jpg",
+        "/images/piano_tiles/3.jpg"
+    ],
     "display": true,
     "order": 1000
 }

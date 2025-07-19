@@ -14,7 +14,23 @@ class HTTPResponse {
     }
 }
 
+function stringlizeDictionary(/*Dictionary*/ data) {
+    let texts = [];
 
+    for (let key in data) {
+        let value = data[key];
+
+        if (value.constructor.name == "Array") {
+            for (let arrayValue of value) {
+                texts.push(`${key}=${encodeURI(arrayValue)}`);
+            }
+        }
+        else
+            texts.push(`${key}=${encodeURI(value)}`);
+    }
+
+    return texts.join("&");
+}
 
 function Get({ url, data, success, error }) {
     let request = new XMLHttpRequest();
@@ -30,11 +46,17 @@ function Get({ url, data, success, error }) {
         error(new HTTPResponse(this.status, this.responseText));
     });
 
+    if (location.hostname == "127.0.0.1")
+    {
+        if (data == null) data = {};
+        data["timestamp"] = new Date().getTime();
+    }
+
     if (data != null) {
-        let key = GetCookie("key");
-        if (data.key == undefined && key != "") data.key = key;
         url += "?" + stringlizeDictionary(data);
     }
+
+    console.log(`GET ${url}`);
 
     request.open("GET", url, true);
     request.send();

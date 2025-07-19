@@ -1,5 +1,7 @@
 section#experiences {
-    padding: 12%;
+    padding: 0 12%;
+    padding-top: 80px;
+    padding-bottom: 20px;
 }
 
 section#experiences article {
@@ -9,7 +11,7 @@ section#experiences article {
 }
 
 section#experiences article .description {
-    width: 70%;
+    width: 60%;
     margin-right: 40px;
     display: flex;
     align-items: flex-start;
@@ -53,15 +55,15 @@ section#experiences article .description .summary p {
     text-align: justify;
 }
 
-section#experiences article .linked-progects {
+section#experiences article .linked-projects {
     display: inline-block;
-    width: 25%;
+    width: 40%;
 }
 
-section#experiences article .linked-progects img {
+section#experiences article .linked-projects > img {
     width: 100%;
-    height: auto;
     border-radius: 10px;
+    margin-bottom: 10px;
 }
 
 @media screen and (max-width: 768px) {
@@ -79,13 +81,17 @@ section#experiences article .linked-progects img {
         margin-bottom: 20px;
     }
 
-    section#experiences article .linked-progects {
+    section#experiences article .linked-projects {
+        display: flex;
         width: 100%;
         margin-bottom: 20px;
+        overflow-x: scroll;
     }
 
-    section#experiences article .linked-progects img {
+    section#experiences article .linked-projects img {
         width: 33%;
         height: auto;
+        margin-right: 10px;
+        margin-bottom: 0;
     }
 }

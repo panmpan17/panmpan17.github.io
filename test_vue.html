@@ -1,55 +1,38 @@
 <!DOCTYPE html>
 <html lang="en">
+
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Document</title>
+    <title>Vue Image Carousel</title>
+    <script src="https://unpkg.com/vue@3/dist/vue.global.prod.js"></script>
 
-    
-    <script src="https://unpkg.com/vue@3/dist/vue.global.js"></script>
-    <script src="javascript/request.js"></script>
+    <link rel="stylesheet" href="css/carousel.css">
 </head>
+
 <body>
+    <div id="app">
+        <image-carousel :images="imageUrls"></image-carousel>
+    </div>
 
-    
-    <div id="app">{{ message }}</div>
-
+    <script src="javascript/carousel.js"></script>
     <script>
-    const { createApp, ref } = Vue
-    const defaultLanguage = "en-us";
-    const optionalLanguages = [ "zh-tw" ];
-
-    const userLanguage = (navigator.language || navigator.userLanguage).toLowerCase();
-
-
-    function View() {
-        let self = this;
-        this.language = defaultLanguage;
-
-        if (optionalLanguages.includes(userLanguage))
-            this.language = userLanguage;
-
-        this.pageData = {
-            message: ref('Loading...'),
-        };
-
-        this.data = function () {
-            return self.pageData;
-        };
-
-
-
-        Get({
-            url: `language/${this.language}/page.json`,
-            success: (msg) => {
-                let json = msg.jsonlizeText();
-                self.pageData.message.value = json.message;
+        const app = Vue.createApp({
+            components: {
+                ImageCarousel
             },
+            data() {
+                return {
+                    imageUrls: [
+                        'images/space_odyssey/1.jpg',
+                        'images/space_odyssey/2.jpg',
+                        'images/space_odyssey/3.jpg',
+                    ]
+                };
+            }
         });
-    }
 
-    let app = createApp(new View());
-    app.mount("#app");
+        app.mount('#app');
     </script>
 </body>
+
 </html>

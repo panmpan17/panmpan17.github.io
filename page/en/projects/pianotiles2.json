@@ -6,7 +6,7 @@
         "/images/piano_tiles/2.jpg",
         "/images/piano_tiles/3.jpg"
     ],
-    "summary": "<TODO>",
+    "summary": "Participated in the development of the Google Play Store and Apple iOS versions, which included implementing a brand-new multiplayer game mode, publishing to Apple Arcade and Google Play Pass, building a Remote Dynamic Assets System, Cross-Device Cloud Save, and other gameplay modes. Development was done using C++ in combination with Objective-C and Java, and involved integration of ad SDKs, In-App Purchase flows, and data collection systems.",
     "organization": "kooapps",
     "time": {
         "start": "2024-07",

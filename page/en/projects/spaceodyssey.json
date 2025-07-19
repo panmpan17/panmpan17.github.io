@@ -9,7 +9,7 @@
         "/images/space_odyssey/5.jpg",
         "/images/space_odyssey/6.jpg"
     ],
-    "summary": "<TODO>",
+    "summary": "A 3D cooperative multiplayer party game where four players work together to control a single spaceship. The ship features four distinct roles, each with unique mechanics and gameplay. I was solely responsible for all programming in the project, totaling over 50,000 lines of code. The development involved tackling challenges such as multiplayer networking, game balance design, physics calculation, level structuring, and project scheduling—significantly expanding my technical skills and practical experience.",
     "organization": "darkhotpot",
     "time": {
         "start": "2023-02",

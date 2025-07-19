@@ -66,6 +66,10 @@ const userLanguage = (navigator.language || navigator.userLanguage).toLowerCase(
 
         this.langaugesData = {};
 
+        this.components = {
+            ImageCarousel
+        };
+
         this.data = function () {
             return self.pageData;
         };

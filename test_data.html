@@ -15,8 +15,10 @@
     <link rel="stylesheet" href="css/project-card.css">
     <link rel="stylesheet" href="css/experience.css">
     <link rel="stylesheet" href="css/theme.css">
+    <link rel="stylesheet" href="css/carousel.css">
 
     <script src="https://unpkg.com/vue@3/dist/vue.global.js"></script>
+    <script src="javascript/carousel.js"></script>
     <script src="javascript/request.js"></script>
 
     <style>
@@ -24,22 +26,25 @@
             position: fixed;
             left: 15px;
             bottom: 15px;
-            width: 40px;
-            height: 40px;
+            width: 50px;
+            height: 50px;
             line-height: 40px;;
             text-align: center;
-            border-radius: 20px;
+            border-radius: 50%;
             border: none;
-            background: #000000c1;
-            color: white;
+            /* background: linear-gradient(215deg, #0a0826f5, #221958f5); */
+            background: linear-gradient(215deg, #100d3df5, #352980f5);
+            box-shadow: 0 0 19px rgba(82, 6, 166, 0.83);
+            color: rgba(226, 195, 255, 1);
+            font-size: 1.3em;
             cursor: pointer;
+            z-index: 1000;
+            opacity: 0.7;
+            filter: brightness(0.8);
+            transition: .5s;
         }
-        #change-language:hover {
-            background: #414141c1;
-        }
-        #change-language:active {
-            background: #1b1b1bc1;
-        }
+        #change-language:hover { opacity: 0.9; filter: brightness(1.2); }
+        #change-language:active { opacity: 1; filter: brightness(1) }
     </style>
 </head>
 <body>
@@ -80,20 +85,18 @@
 
         <article v-for="org in sortedOrganizations">
             <div class="description">
-                <div class="icon" style="background: white;">
-                    <img src="images/kooapps.png" alt="">
-                </div>
+                <div class="icon" style="background: white;"><img v-bind:src="org.logo" alt=""></div>
 
                 <div class="summary">
                     <h4>{{ org.name }}</h4>
                     <time>{{ org.time.start }} ~ {{ org.time.end }}</time>
                     <h5>{{ org.job_title }} </h5>
-                    <p>{{ org.summary }}</p>
+                    <p v-html="org.summary"></p>
                 </div>
             </div>
 
-            <div class="linked-progects">
-                <img src="images/project_antkeep.jpeg" alt="">
+            <div class="linked-projects">
+                 <img v-for="image in org.linked_projects" v-bind:src="image" alt="Project Image">
             </div>
         </article>
     </section>
@@ -107,7 +110,7 @@
 
         <article v-for="project in sortedProjects">
             <div class="thumbnail">
-                <img :src="project.images[0]" alt="">
+                <image-carousel :images="project.images"></image-carousel>
             </div>
             <div class="details">
                 <div class="container">
@@ -118,7 +121,7 @@
                     </div>
                     <div id="text">
                         <h3 class="title">{{ project.name }}</h3>
-                        <div class="description">{{ project.summary }}</div>
+                        <div class="description" v-html="project.summary"></div>
 
                         <template v-for="(link, platform) in project.links">
                             <a :href="link" target="_blank">
@@ -132,7 +135,7 @@
     </section>
 
     <button id="change-language" v-on:click="changeLanguage">
-        TA
+        <i class="fas fa-language"></i>
     </button>
 
     <script src="javascript/page_data.js"></script>
