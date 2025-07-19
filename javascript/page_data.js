@@ -1,6 +1,6 @@
 const ORGANIZATION_IDS = [
     "kooapps",
-    "darkhotpot"
+    "tatunguniversity",
 ];
 
 const PROJECT_IDS = [

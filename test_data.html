@@ -52,8 +52,9 @@
     <nav id="navigation">
         <ul>
             <li><a href="#entrance">{{ general.navigation?.top ?? "Intro" }}</a></li>
-            <li><a href="#experiences">{{ general.navigation?.experiences ?? "Experiences" }}</a></li>
+            <li><a href="#skills">{{ general.navigation?.skills ?? "Skills" }}</a></li>
             <li><a href="#projects">{{ general.navigation?.projects ?? "Projects" }}</a></li>
+            <li><a href="#experiences">{{ general.navigation?.experiences ?? "Experiences" }}</a></li>
         </ul>
     </nav>
 
@@ -76,37 +77,19 @@
         </div>
 
         <div id="video">
-            <iframe width="100%" height="100%" src="https://www.youtube.com/embed/XMSNaNPSDL8?si=OxR8bBVm_t5g2e2_" title="YouTube video player" frameborder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share" referrerpolicy="strict-origin-when-cross-origin" allowfullscreen></iframe>
+            <iframe width="100%" height="100%" title="YouTube video player"
+                src="https://www.youtube.com/embed/buWMRzDCdGk?si=nLqGdu5sJJnXi1dh&rel=0&color=white"
+                frameborder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share"
+                referrerpolicy="strict-origin-when-cross-origin" allowfullscreen></iframe>
         </div>
-    </section>
-
-    <section id="experiences">
-        <h2 class="title">{{ general.experiences?.title ?? "Experiences" }}</h2>
-
-        <article v-for="org in sortedOrganizations">
-            <div class="description">
-                <div class="icon" style="background: white;"><img v-bind:src="org.logo" alt=""></div>
-
-                <div class="summary">
-                    <h4>{{ org.name }}</h4>
-                    <time>{{ org.time.start }} ~ {{ org.time.end }}</time>
-                    <h5>{{ org.job_title }} </h5>
-                    <p v-html="org.summary"></p>
-                </div>
-            </div>
-
-            <div class="linked-projects">
-                 <img v-for="image in org.linked_projects" v-bind:src="image" alt="Project Image">
-            </div>
-        </article>
     </section>
 
     <section id="projects">
         <h2 class="title">{{ general.projects?.title ?? "Project" }}</h2>
-        <div id="tags">
+        <!-- <div id="tags">
             <div>C++</div>
             <div class="active">Python</div>
-        </div>
+        </div> -->
 
         <article v-for="project in sortedProjects">
             <div class="thumbnail">
@@ -130,6 +113,27 @@
                         </template>
                     </div>
                 </div>
+            </div>
+        </article>
+    </section>
+
+    <section id="experiences">
+        <h2 class="title">{{ general.experiences?.title ?? "Experiences" }}</h2>
+
+        <article v-for="org in sortedOrganizations">
+            <div class="description">
+                <div class="icon" style="background: white;"><img v-bind:src="org.logo" alt=""></div>
+
+                <div class="summary">
+                    <h4>{{ org.name }}</h4>
+                    <time>{{ org.time.start }} ~ {{ org.time.end }}</time>
+                    <h5 v-html="org.job_title"></h5>
+                    <p v-html="org.summary"></p>
+                </div>
+            </div>
+
+            <div class="linked-projects">
+                 <img v-for="image in org.linked_projects" v-bind:src="image" alt="Project Image">
             </div>
         </article>
     </section>

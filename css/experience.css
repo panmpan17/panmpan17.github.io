@@ -1,6 +1,6 @@
 section#experiences {
     padding: 0 12%;
-    padding-top: 80px;
+    /* padding-top: 80px; */
     padding-bottom: 20px;
 }
 
@@ -11,7 +11,7 @@ section#experiences article {
 }
 
 section#experiences article .description {
-    width: 60%;
+    width: 65%;
     margin-right: 40px;
     display: flex;
     align-items: flex-start;
@@ -20,14 +20,17 @@ section#experiences article .description {
 section#experiences article .description .icon {
     /* display: inline-block; */
     border-radius: 50%;
+    width: 60px;
+    min-width: 60px;
+    height: 60px;
+    padding: 8px;
 }
 
 section#experiences article .description .icon img {
-    /* width: 100%;
-    height: 100%; */
-    padding: 10px;
-    width: 60px;
-    height: 60px;
+    width: 100%;
+    height: 100%;
+    /* width: 60px;
+    height: 60px; */
 }
 
 section#experiences article .description .summary {
@@ -44,11 +47,21 @@ section#experiences article .description .summary h4 {
 section#experiences article .description .summary h5 {
     font-size: 1.05em;
     margin-bottom: 5px;
+    color: rgb(195, 195, 195);
+}
+
+section#experiences article .description .summary h5 sub {
+    font-size: 0.8em;
+    color: #8f8f8f;
+    display: block;
+    padding-top: 3px;
+    padding-bottom: 5px;
 }
 
 section#experiences article .description .summary time {
     float: right;
     color: #8f8f8f;
+    font-size: .8em;
 }
 
 section#experiences article .description .summary p {
@@ -57,7 +70,7 @@ section#experiences article .description .summary p {
 
 section#experiences article .linked-projects {
     display: inline-block;
-    width: 40%;
+    width: 35%;
 }
 
 section#experiences article .linked-projects > img {

@@ -1,0 +1,15 @@
+{
+    "id": "tatunguniversity",
+    "name": "Tatung University",
+    "job_title": "Media Design<sub>Game Design Department</sub>",
+    "time": {
+        "start": "2023/02",
+        "end": "2024/06"
+    },
+    "summary": "During my university years, I participated in four VR education projects supported by Taiwan’s Ministry of Education. These projects integrated VR technology with elementary and junior high school curricula, enabling students to experience scientific phenomena and experiments that are difficult to present through textbooks. I was involved in designing interactive lessons and gameplay levels, structuring the overall project workflow, and coordinating task distribution for junior teammates. I also worked directly with students during pilot sessions, gaining valuable insights into their learning experiences, enjoyment, and challenges.<br><br>My graduation project, Space Odyssey, is a 3D cooperative multiplayer party game where four players work together to control a single spaceship, each taking on a unique role with distinct gameplay mechanics. I independently wrote over 50,000 lines of code for the project, handling all technical aspects including multiplayer synchronization, physics simulation, game balance, level design, and project scheduling.<br><br>In addition, I served as the head of public relations for our graduation showcase team. I led efforts to secure sponsorships from ASUS and Tatung Company, managed marketing and promotional campaigns (FB/IG/YT), coordinated exhibition setup, and organized the opening event. I also represented the team at the Young Designers’ Exhibition, presenting our work to the public and industry professionals. From development to promotion, I experienced the full journey of bringing a project from concept to public launch.",
+    "logo": "/images/tatunguniversity.png",
+    "linked_projects": [
+    ],
+    "display": true,
+    "order": 900
+}
