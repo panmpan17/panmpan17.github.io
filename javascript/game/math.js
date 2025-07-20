@@ -1,5 +1,9 @@
 const TWO_PI = Math.PI * 2;
 
+function lerp(start, end, t) {
+    return start + (end - start) * t;
+}
+
 function round(number, precision = 2) {
     let factor = Math.pow(10, precision);
     return Math.round(number * factor) / factor;

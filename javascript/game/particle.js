@@ -18,6 +18,8 @@ class Particle {
         this.velocityY = 0;
         this.rotation = 0;
         this.lifetime = 0; // in seconds
+        this.lifetimeLeft = 0; // in seconds
+        this.scale = 1;
         this.opacity = 1; // 0 to 1
         // this.enabled = false;
         this.imageIndex = 0;
@@ -85,18 +87,20 @@ class ParticleSystem {
         // let opacity = Math.random(); // Random opacity between 0 and 1
 
         for (let particle of this.particles) {
-            if (particle.lifetime <= 0) {
+            if (particle.lifetimeLeft <= 0) {
                 particle.x = x;
                 particle.y = y;
                 particle.velocityX = velocityX;
                 particle.velocityY = velocityY;
                 particle.rotation = Math.random() * 2 * Math.PI; // Random rotation
                 particle.lifetime = lifetime;
-                particle.opacity = Math.random();
+                particle.lifetimeLeft = lifetime; // Reset lifetime
+                particle.opacity = Math.random();; // Reset scale
 
                 if (this.particleImage === eParticleImage.Images && this.images.length > 0) {
                     // Randomly select an image index
                     particle.imageIndex = randomInt(0, this.images.length - 1);
+                    particle.scale = this.particleImageSize.random();
                 }
                 return;
             }
@@ -113,19 +117,19 @@ class ParticleSystem {
         }
 
         for (let particle of this.particles) {
-            if (particle.lifetime <= 0) {
+            if (particle.lifetimeLeft <= 0) {
                 continue;
             }
 
             particle.x += particle.velocityX * deltaTime;
             particle.y += particle.velocityY * deltaTime;
-            particle.lifetime -= deltaTime;
+            particle.lifetimeLeft -= deltaTime;
         }
     }
 
     draw(gameCanvas) {
         for (let particle of this.particles) {
-            if (particle.lifetime > 0) {
+            if (particle.lifetimeLeft > 0) {
                 let pos = gameCanvas.camera.worldToScreen(particle.x, particle.y);
 
                 switch (this.particleImage) {
@@ -136,12 +140,12 @@ class ParticleSystem {
                         // If you want to use images, you can add logic here
                         // For now, we will just draw a circle
                         let image = this.images[particle.imageIndex];
-                        let width = image.width * this.particleImageSize;
-                        let height = image.height * this.particleImageSize;
+                        let width = image.width * particle.scale;
+                        let height = image.height * particle.scale;
                         gameCanvas.context.save();
                         gameCanvas.context.translate(pos.x, pos.y);
                         gameCanvas.context.rotate(particle.rotation);
-                        gameCanvas.context.globalAlpha = particle.opacity;
+                        gameCanvas.context.globalAlpha = lerp(particle.opacity, 0, 1 - particle.lifetimeLeft / particle.lifetime);
                         gameCanvas.context.drawImage(image, -width / 2, -height / 2, width, height);
                         gameCanvas.context.restore();
                         break;
