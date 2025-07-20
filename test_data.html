@@ -52,7 +52,7 @@
     <nav id="navigation">
         <ul>
             <li><a href="#entrance">{{ general.navigation?.top ?? "Intro" }}</a></li>
-            <li><a href="#skills">{{ general.navigation?.skills ?? "Skills" }}</a></li>
+            <!-- <li><a href="#skills">{{ general.navigation?.skills ?? "Skills" }}</a></li> -->
             <li><a href="#projects">{{ general.navigation?.projects ?? "Projects" }}</a></li>
             <li><a href="#experiences">{{ general.navigation?.experiences ?? "Experiences" }}</a></li>
         </ul>
@@ -98,9 +98,9 @@
             <div class="details">
                 <div class="container">
                     <div id="icon">
-                        <div>
-                            <i class="fab fa-python"></i>
-                        </div>
+                        <template v-for="skill in project.skills">
+                            <div v-html="getSkillIcon(skill)"></div>
+                        </template>
                     </div>
                     <div id="text">
                         <h3 class="title">{{ project.name }}</h3>
@@ -111,7 +111,7 @@
                                 <i v-bind:class="getPlatformIcon(platform)"></i> {{ platform }}
                             </a>
                         </template>
-                    </div>
+                    </div>           
                 </div>
             </div>
         </article>
@@ -132,7 +132,7 @@
                 </div>
             </div>
 
-            <div class="linked-projects">
+            <div class="linked-projects"> <!--  :style="{ 'max-height': this.previousElementSibling.offsetHeight + 'px' }" -->
                  <img v-for="image in org.linked_projects" v-bind:src="image" alt="Project Image">
             </div>
         </article>
@@ -143,5 +143,8 @@
     </button>
 
     <script src="javascript/page_data.js"></script>
+    <script>
+
+    </script>
 </body>
 </html>

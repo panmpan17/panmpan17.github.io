@@ -1,8 +1,15 @@
 {
     "id": "schoolvr",
-    "name": "<TODO>",
-    "images": [],
-    "summary": "<TODO>",
+    "name": "VR Educational Content Development Project",
+    "images": [
+        "/images/schoolvr/1.jpg",
+        "/images/schoolvr/2.jpg",
+        "/images/schoolvr/3.jpg",
+        "/images/schoolvr/4.jpg",
+        "/images/schoolvr/5.jpg",
+        "/images/schoolvr/6.jpg"
+    ],
+    "summary": "This VR educational content development initiative was part of a national project funded by the Ministry of Education, led by Professor Chen-Hung Huang. It aimed to integrate virtual reality with elementary and junior high school curricula, allowing students to experience scientific phenomena and experiments that are often absent from textbooks. From my freshman to senior year, I participated in four different project cycles, contributing to the design of interactive lessons and gameplay-based learning modules. I also helped structure overall project workflows, coordinated task assignments for junior team members, and engaged directly with students during pilot sessions—gaining a clear understanding of both the enjoyment and challenges they faced while using VR in learning.",
     "organization": "tatung",
     "time": {
         "start": "2020-12",
@@ -23,6 +30,11 @@
         "Game",
         "Education"
     ],
-    "links": {},
+    "links": {
+        "The 3D World on Paper": "https://moevrar.tku.edu.tw/material_detail.cshtml?id=158",
+        "The Secret of a Shrinking World": "https://moevrar.tku.edu.tw/material_detail.cshtml?id=142",
+        "Adventure in the World of Energy": "https://moevrar.tku.edu.tw/material_detail.cshtml?id=127",
+        "The Secret of Exploratory Power": "https://moevrar.tku.edu.tw/material_detail.cshtml?id=100"
+    },
     "order": 800
 }

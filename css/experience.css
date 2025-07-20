@@ -71,6 +71,7 @@ section#experiences article .description .summary p {
 section#experiences article .linked-projects {
     display: inline-block;
     width: 35%;
+    overflow-y: scroll;
 }
 
 section#experiences article .linked-projects > img {

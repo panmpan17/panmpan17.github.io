@@ -1,7 +1,14 @@
 {
     "id": "schoolvr",
-    "name": "<TODO>",
-    "images": [],
+    "name": "VR 教材開發計畫",
+    "images": [
+        "/images/schoolvr/1.jpg",
+        "/images/schoolvr/2.jpg",
+        "/images/schoolvr/3.jpg",
+        "/images/schoolvr/4.jpg",
+        "/images/schoolvr/5.jpg",
+        "/images/schoolvr/6.jpg"
+    ],
     "summary": "教育部的 VR 教材開發推動計畫，由教授黃臣鴻帶領研發，結合 VR 和國中小教程，讓學生能在 VR 體驗課本上缺少的實驗和現象。從大一到大四，參與過四個不同專案開發，製作教學與遊戲互動關卡，架構整個專案流程與協調學弟妹的工作分配，也第一手接觸學生體驗，清楚理解到使用者的樂趣和挑戰。",
     "organization": "tatung",
     "time": {
@@ -23,6 +30,11 @@
         "Game",
         "Education"
     ],
-    "links": {},
+    "links": {
+        "圖紙上的 3D 世界": "https://moevrar.tku.edu.tw/material_detail.cshtml?id=158",
+        "世界變小的秘密": "https://moevrar.tku.edu.tw/material_detail.cshtml?id=142",
+        "能量世界的探險": "https://moevrar.tku.edu.tw/material_detail.cshtml?id=127",
+        "探索力的秘密": "https://moevrar.tku.edu.tw/material_detail.cshtml?id=100"
+    },
     "order": 800
 }

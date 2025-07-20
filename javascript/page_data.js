@@ -6,7 +6,7 @@ const ORGANIZATION_IDS = [
 const PROJECT_IDS = [
     "pianotiles2",
     "spaceodyssey",
-    // "schoolvr",
+    "schoolvr",
 ];
 
 const userLanguage = (navigator.language || navigator.userLanguage).toLowerCase();
@@ -34,6 +34,27 @@ const userLanguage = (navigator.language || navigator.userLanguage).toLowerCase(
                         return "fab fa-itch-io";
                     default:
                         return "fas fa-link";
+                }
+            },
+
+            getSkillIcon: function (skill) {
+                switch (skill) {
+                    case "Python":
+                        return `<i class="fab fa-python"></i>`;
+                    case "C#":
+                        return `<b style="font-size: 0.8em">C#</b>`;
+                    case "C++":
+                        return `<b style="font-size: 0.7em">C++</b>`;
+                    case "Java":
+                        return `<i class="fab fa-java"></i>`;
+                    case "Objective-C":
+                        return `<i class="fab fa-apple" style="font-size: 0.8em"></i><b style="font-size: 0.8em">C</b>`;
+                    case "Unity":
+                        return `<i class="fab fa-unity"></i>`;
+                    case "VR":
+                        return `<b style="font-size: 0.8em">VR</b>`;
+                    default:
+                        return `<i class="fas fa-code"></i>`;
                 }
             },
 
