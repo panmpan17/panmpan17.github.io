@@ -35,6 +35,10 @@ function rotateRadianTowards(current, target, amount) {
     return result;
 }
 
+function randomInt(min, max) {
+    return Math.floor(Math.random() * (max - min + 1)) + min;
+}
+
 
 class Vector {
     constructor(x, y) {
@@ -95,3 +99,21 @@ class Vector {
 
 const VectorZero = new Vector(0, 0);
 
+class Range {
+    constructor(min, max) {
+        this.min = min;
+        this.max = max;
+    }
+
+    contains(value) {
+        return value >= this.min && value <= this.max;
+    }
+
+    clamp(value) {
+        return Math.max(this.min, Math.min(this.max, value));
+    }
+
+    random() {
+        return Math.random() * (this.max - this.min) + this.min;
+    }
+}

@@ -23,6 +23,7 @@
 
     <script src="/javascript/game/math.js"></script>
     <script src="/javascript/game/draw.js"></script>
+    <script src="/javascript/game/particle.js"></script>
     <script>
         let images = {};
         let FPS = 60;
@@ -36,6 +37,46 @@
                 };
                 images[name].onerror = () => reject(new Error(`Failed to load image: ${src}`));
             });
+        }
+
+        class Camera {
+            constructor({ x, y, width, height }) {
+                this.pos = new Vector(x, y);
+                this.width = width;
+                this.height = height;
+            }
+
+            screenToWorld(screenX, screenY) {
+                return new Vector(
+                    this.pos.x + screenX - this.width / 2,
+                    this.pos.y + screenY - this.height / 2
+                );
+            }
+
+            worldToScreen(worldX, worldY) {
+                // Assuming the camera is at the origin (0, 0)
+                return new Vector(
+                    worldX - this.pos.x + this.width / 2,
+                    worldY - this.pos.y + this.height / 2
+                );
+            }
+        }
+
+        class FollowCamera {
+            constructor({ camera, target }) {
+                this.camera = camera;
+                this.target = target; // The node to follow
+            }
+
+            update(gameCanvas, deltaTime) {
+                if (this.target) {
+                    this.camera.pos.x = this.target.pos.x;
+                    this.camera.pos.y = this.target.pos.y;
+                    gameCanvas.onCameraMove();
+                }
+            }
+
+            draw(gameCanvas) {}
         }
 
         class SimpleImageNode {
@@ -52,7 +93,8 @@
                 let width = this.image.width * this.scale;
                 let height = this.image.height * this.scale;
                 gameCanvas.context.save();
-                gameCanvas.context.translate(this.pos.x, this.pos.y);
+                let screenPos = gameCanvas.camera.worldToScreen(this.pos.x, this.pos.y);
+                gameCanvas.context.translate(screenPos.x, screenPos.y);
                 gameCanvas.context.rotate(this.rotation);
                 gameCanvas.context.drawImage(this.image, -width / 2, -height / 2, width, height);
                 gameCanvas.context.restore();
@@ -66,9 +108,15 @@
                 this.velocity = new Vector(0, 0);
                 this.mouseDown = false;
 
-                this.flySpeed = 10;
-                this.accelerationSpeed = 50;
-                this.drag = 20;
+                this.cursorCirclePosition = new Vector(0, 0);
+
+                this.clampDistance = 100;
+                this.flySpeed = 3;
+                this.accelerationSpeed = 150;
+                this.drag = 100;
+                this.rotateSpeed = 4;
+
+                this.smokeParticleSystem = null;
             }
 
             update(gameCanvas, deltaTime) {
@@ -83,16 +131,22 @@
                 }
 
                 this.pos = this.pos.add(this.velocity.multiply(deltaTime));
+
+                if (this.smokeParticleSystem) {
+                    this.smokeParticleSystem.pos = this.pos;
+                    // this.smokeParticleSystem.update(gameCanvas, deltaTime);
+                }
             }
 
             updateVelocity(gameCanvas, deltaTime) {
                 let delta = gameCanvas.mousePositionWorld.subtract(this.pos);
                 let targetRotation = delta.getAngleInRadians() + (3.14 / 2);
 
-                this.rotation = rotateRadianTowards(this.rotation, targetRotation, 0.1);
+                this.rotation = rotateRadianTowards(this.rotation, targetRotation, this.rotateSpeed * deltaTime);
 
                 if (delta.sqrMagnitude() > 0.01) {
-                    let clamedDelta = delta.clampMagnitude(100);
+                    let clamedDelta = delta.clampMagnitude(this.clampDistance);
+                    this.cursorCirclePosition = this.pos.add(clamedDelta);
                     let targetVelocity = clamedDelta.multiply(this.flySpeed); // Speed factor
                     this.velocity = this.velocity.moveTowards(targetVelocity, this.accelerationSpeed * deltaTime);
 
@@ -106,15 +160,29 @@
             draw(gameCanvas) {
                 super.draw(gameCanvas);
 
-                drawText(gameCanvas.context, round(this.rotation), 10, 50);
-                drawText(gameCanvas.context, `${round(this.velocity.x)}, ${round(this.velocity.y)}`, 10, 70);
+                drawText(gameCanvas.context, `Pos: ${round(this.pos.x)}, ${round(this.pos.y)}`, 10, 20);
+                drawText(gameCanvas.context, `Vel: ${round(this.velocity.x)}, ${round(this.velocity.y)}`, 10, 40);
+                drawText(gameCanvas.context, `Rot: ${round(this.rotation)}`, 10, 60);
 
-                let delta = gameCanvas.mousePositionWorld.subtract(this.pos);
+                // let delta = gameCanvas.mousePositionWorld.subtract(this.pos);
 
                 if (gameCanvas.mouseInFrame && gameCanvas.mouseDown) {
-                    let clamedDelta = delta.clampMagnitude(100);
-                    let pos = this.pos.add(clamedDelta);
-                    drawCircle(gameCanvas.context, pos.x, pos.y, 5, 'red');
+                    let screenPos = gameCanvas.camera.worldToScreen(this.cursorCirclePosition.x, this.cursorCirclePosition.y);
+                    drawCircle(gameCanvas.context, screenPos.x, screenPos.y, 5, 'red');
+                }
+            }
+
+            onMouseDown(event) {
+                this.mouseDown = true;
+                if (this.smokeParticleSystem) {
+                    this.smokeParticleSystem.spawningEnabled = true;
+                }
+            }
+
+            onMouseUp(event) {
+                this.mouseDown = false;
+                if (this.smokeParticleSystem) {
+                    this.smokeParticleSystem.spawningEnabled = false;
                 }
             }
         }
@@ -123,6 +191,13 @@
             constructor() {
                 this.canvas = document.getElementById('gameCanvas');
                 this.context = this.canvas.getContext('2d');
+
+                this.camera = new Camera({
+                    x: 0,
+                    y: 0,
+                    width: this.canvas.width,
+                    height: this.canvas.height
+                });
 
                 this.canvas.addEventListener('mousedown', this.onMouseDown.bind(this));
                 this.canvas.addEventListener('mouseup', this.onMouseUp.bind(this));
@@ -138,8 +213,32 @@
 
                 this.lastTime = null;
 
+                let particle = new ParticleSystem(200);
+                // particle.spawnShape = eParticleShape.Square;
+                // particle.spawnShapeSize = 100;
+                // particle.spawnShapeSizeB = 50;
+                particle.particleImage = eParticleImage.Images;
+                particle.particleImageSize = 1.4;
+                particle.images = [images.dust1, images.dust2, images.dust3, images.dust4];
+                particle.interval = 0.02;
+
+                this.ship = new Ship(0, 0);
+                this.ship.smokeParticleSystem = particle;
+                this.followCamera = new FollowCamera({
+                    camera: this.camera,
+                    target: this.ship
+                });
+
                 this.children = [
-                    new Ship(this.canvas.width / 2, this.canvas.height / 2),
+                    new SimpleImageNode({ image: images.asteroid, x: -100, y: 100, scale: 1.2 }),
+                    new SimpleImageNode({ image: images.asteroid, x: -200, y: 200, scale: 1 }),
+                    new SimpleImageNode({ image: images.asteroid, x: 300, y: -300, scale: 0.8 }),
+                    new SimpleImageNode({ image: images.asteroid, x: 100, y: 400, scale: 0.5 }),
+                    new SimpleImageNode({ image: images.asteroid, x: 200, y: 500, scale: 1 }),
+                    new SimpleImageNode({ image: images.asteroid, x: 300, y: 600, scale: 1.2 }),
+                    particle,
+                    this.ship,
+                    this.followCamera,
                 ];
             }
 
@@ -174,16 +273,25 @@
             }
             onMouseDown(event) {
                 this.mouseDown = true;
+
+                for (let i = 0; i < this.children.length; i++) {
+                    this.children[i].onMouseDown && this.children[i].onMouseDown(event);
+                }
             }
             onMouseUp(event) {
                 this.mouseDown = false;
-                
+
+                for (let i = 0; i < this.children.length; i++) {
+                    this.children[i].onMouseUp && this.children[i].onMouseUp(event);
+                }
             }
             onMouseMove(event) {
                 this.mousePosition.x = event.offsetX;
                 this.mousePosition.y = event.offsetY;
-                this.mousePositionWorld.x = this.mousePosition.x; // Adjust if needed for world coordinates
-                this.mousePositionWorld.y = this.mousePosition.y; // Adjust if needed for world coordinates
+                this.mousePositionWorld = this.camera.screenToWorld(this.mousePosition.x, this.mousePosition.y);
+            }
+            onCameraMove(event) {
+                this.mousePositionWorld = this.camera.screenToWorld(this.mousePosition.x, this.mousePosition.y);
             }
         }
 
@@ -192,6 +300,11 @@
             // Load images
             Promise.all([
                 loadImage('ship', '/images/game/ship.png'),
+                loadImage('asteroid', '/images/game/stone.png'),
+                loadImage('dust1', '/images/game/dust_1.png'),
+                loadImage('dust2', '/images/game/dust_2.png'),
+                loadImage('dust3', '/images/game/dust_3.png'),
+                loadImage('dust4', '/images/game/dust_4.png'),
                 // Add more images as needed
             ]).then(() => {
                 console.log('All images loaded successfully');
