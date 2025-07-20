@@ -21,6 +21,8 @@
 <body>
     <canvas id="gameCanvas" width="800" height="600"></canvas>
 
+    <script src="/javascript/game/math.js"></script>
+    <script src="/javascript/game/draw.js"></script>
     <script>
         let images = {};
         let FPS = 60;
@@ -36,19 +38,12 @@
             });
         }
 
-        function drawCircle(context, x, y, radius, color) {
-            context.fillStyle = color;
-            context.beginPath();
-            context.arc(x, y, radius, 0, Math.PI * 2);
-            context.fill();
-        }
-
         class SimpleImageNode {
             constructor({image, x, y, scale}) {
                 this.image = image;
-                this.x = x;
-                this.y = y;
+                this.pos = new Vector(x, y);
                 this.scale = scale || 1;
+                this.rotation = 0; // In radians
             }
 
             update(gameCanvas, deltaTime) {}
@@ -56,9 +51,11 @@
             draw(gameCanvas) {
                 let width = this.image.width * this.scale;
                 let height = this.image.height * this.scale;
-                gameCanvas.context.drawImage(this.image, this.x - width / 2, this.y - height / 2, width, height);
-
-                // drawCircle(gameCanvas.context, this.x, this.y + 100, 5, 'red');
+                gameCanvas.context.save();
+                gameCanvas.context.translate(this.pos.x, this.pos.y);
+                gameCanvas.context.rotate(this.rotation);
+                gameCanvas.context.drawImage(this.image, -width / 2, -height / 2, width, height);
+                gameCanvas.context.restore();
             }
         }
 
@@ -66,19 +63,58 @@
             constructor(x, y) {
                 super({ image: images.ship, x, y, scale: 0.8 });
 
-                this.velocityX = 0;
-                this.velocityY = 0;
+                this.velocity = new Vector(0, 0);
                 this.mouseDown = false;
+
+                this.flySpeed = 10;
+                this.accelerationSpeed = 50;
+                this.drag = 20;
             }
 
             update(gameCanvas, deltaTime) {
+                let isMoving = false;
+                if (gameCanvas.mouseDown && gameCanvas.mouseInFrame) {
+                    isMoving = this.updateVelocity(gameCanvas, deltaTime);
+                }
+
+                if (!isMoving) {
+                    // Apply drag effect when not moving
+                    this.velocity = this.velocity.moveTowards(VectorZero, this.drag * deltaTime);
+                }
+
+                this.pos = this.pos.add(this.velocity.multiply(deltaTime));
+            }
+
+            updateVelocity(gameCanvas, deltaTime) {
+                let delta = gameCanvas.mousePositionWorld.subtract(this.pos);
+                let targetRotation = delta.getAngleInRadians() + (3.14 / 2);
+
+                this.rotation = rotateRadianTowards(this.rotation, targetRotation, 0.1);
+
+                if (delta.sqrMagnitude() > 0.01) {
+                    let clamedDelta = delta.clampMagnitude(100);
+                    let targetVelocity = clamedDelta.multiply(this.flySpeed); // Speed factor
+                    this.velocity = this.velocity.moveTowards(targetVelocity, this.accelerationSpeed * deltaTime);
+
+                    // TODO: Add effect for drag point
+                    return true;
+                }
+
+                return false;
             }
 
             draw(gameCanvas) {
                 super.draw(gameCanvas);
 
-                if (gameCanvas.mouseInFrame) {
-                    drawCircle(gameCanvas.context, gameCanvas.mousePositionX, gameCanvas.mousePositionY, 5, 'red');  
+                drawText(gameCanvas.context, round(this.rotation), 10, 50);
+                drawText(gameCanvas.context, `${round(this.velocity.x)}, ${round(this.velocity.y)}`, 10, 70);
+
+                let delta = gameCanvas.mousePositionWorld.subtract(this.pos);
+
+                if (gameCanvas.mouseInFrame && gameCanvas.mouseDown) {
+                    let clamedDelta = delta.clampMagnitude(100);
+                    let pos = this.pos.add(clamedDelta);
+                    drawCircle(gameCanvas.context, pos.x, pos.y, 5, 'red');
                 }
             }
         }
@@ -96,8 +132,8 @@
 
 
                 this.mouseInFrame = false;
-                this.mousePositionX = 0;
-                this.mousePositionY = 0;
+                this.mousePosition = new Vector(0, 0);
+                this.mousePositionWorld = new Vector(0, 0);
                 this.mouseDown = false;
 
                 this.lastTime = null;
@@ -144,8 +180,10 @@
                 
             }
             onMouseMove(event) {
-                this.mousePositionX = event.offsetX;
-                this.mousePositionY = event.offsetY;
+                this.mousePosition.x = event.offsetX;
+                this.mousePosition.y = event.offsetY;
+                this.mousePositionWorld.x = this.mousePosition.x; // Adjust if needed for world coordinates
+                this.mousePositionWorld.y = this.mousePosition.y; // Adjust if needed for world coordinates
             }
         }
 
