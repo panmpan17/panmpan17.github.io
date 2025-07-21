@@ -7,7 +7,7 @@ section#experiences {
 section#experiences article {
     display: flex;
     align-items: flex-start;
-    margin-bottom: 25px;
+    margin-bottom: 55px;
 }
 
 section#experiences article .description {
@@ -69,12 +69,52 @@ section#experiences article .description .summary p {
 }
 
 section#experiences article .linked-projects {
+    position: relative;
     display: inline-block;
     width: 35%;
+}
+
+section#experiences article .linked-projects .top-scroll {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 20px;
+    background: linear-gradient(to top, rgba(0, 0, 0, 0), rgba(0, 0, 0, .7));
+}
+
+section#experiences article .linked-projects .bottom-scroll {
+    position: absolute;
+    bottom: 0;
+    left: 0;
+    width: 100%;
+    height: 20px;
+    background: linear-gradient(to bottom, rgba(0, 0, 0, 0), rgba(0, 0, 0, .7));
+}
+
+section#experiences article .linked-projects .left-scroll {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 20px;
+    height: 100%;
+    background: linear-gradient(to left, rgba(0, 0, 0, 0), rgba(0, 0, 0, .7));
+}
+
+section#experiences article .linked-projects .right-scroll {
+    position: absolute;
+    top: 0;
+    right: 0;
+    width: 20px;
+    height: 100%;
+    background: linear-gradient(to right, rgba(0, 0, 0, 0), rgba(0, 0, 0, .7));
+}
+
+section#experiences article .linked-projects .container {
     overflow-y: scroll;
 }
 
-section#experiences article .linked-projects > img {
+section#experiences article .linked-projects > .container > img {
     width: 100%;
     border-radius: 10px;
     margin-bottom: 10px;
@@ -96,13 +136,16 @@ section#experiences article .linked-projects > img {
     }
 
     section#experiences article .linked-projects {
-        display: flex;
         width: 100%;
         margin-bottom: 20px;
+    }
+
+    section#experiences article .linked-projects .container {
+        display: flex;
         overflow-x: scroll;
     }
 
-    section#experiences article .linked-projects img {
+    section#experiences article .linked-projects .container img {
         width: 33%;
         height: auto;
         margin-right: 10px;

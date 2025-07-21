@@ -3,151 +3,126 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Michael Pan | Game Programmer</title>
 
-    <title>Michael Pan</title>
+    <meta name="theme-color" content="#100D33" media="(prefers-color-scheme: light)">
+    <meta name="theme-color" content="#100D33" media="(prefers-color-scheme: dark)">
 
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/css/all.min.css">
 
-    <script src="https://unpkg.com/vue@3/dist/vue.global.js"></script>
+    <link rel="stylesheet" href="css/entrance.css">
+    <link rel="stylesheet" href="css/navigation-bar.css">
+    <link rel="stylesheet" href="css/project-card.css">
+    <link rel="stylesheet" href="css/experience.css">
+    <link rel="stylesheet" href="css/theme.css">
+    <link rel="stylesheet" href="css/carousel.css">
+
+    <!-- <script src="https://unpkg.com/vue@3/dist/vue.global.js"></script> -->
+    <script src="https://unpkg.com/vue@3/dist/vue.global.prod.js"></script>
+    <script src="javascript/carousel.js"></script>
     <script src="javascript/request.js"></script>
+    <script src="javascript/page_data.js"></script>
 </head>
 <body>
-    <section id="start">
-        <h1 class="my-name">{{my_name}}</h1>
-        <h3 class="profession">{{profession}}</h3>
-        <summary class="summary">{{summary}}</summary>
-        <ul class="contacts">
-            <li><i class="fas fa-map-marker-alt"></i> {{location}}</li>
-            <a href="https://github.com/panmpan17">
-                <li><i class="fab fa-github"></i> panmpan17</li>
-            </a>
-            <a href="mailto: panmpan@gmail.com">
-                <li><i class="fas fa-envelope"></i> panmpan@gmail.com</li>
-            </a>
-            <a href="tel: 0966558397">
-                <li><i class="fas fa-phone"></i> 0966558397</li>
-            </a>
-            <a href="https://michaelpan.itch.io" target="_blank">
-                <li><i class="fab fa-itch-io"></i> michaelpan</li>
-            </a>
-        </ul>
-    </section>
-
-    <section id="biography">
-        <h2>{{biography_text}}</h2>
-        <div v-html="biography"></div>
-    </section>
-
-    <section id="skills">
-        <h2>{{skill_text}}</h2>
+    <div id="entire-page-background"></div>
+    <nav id="navigation">
         <ul>
-            <li><i class="fab fa-unity"></i> Unity</li>
-            <li>C#</li>
-            <li><i class="fab fa-python"></i> Python</li>
-            <li><i class="fab fa-js"></i> Javascript</li>
-            <li><i class="fab fa-html5"></i> HTML & CSS</li>
-            <li>Arduino</li>
-            <li>C++</li>
-            <li><i class="fab fa-docker"></i> Docker</li>
-            <li><i class="fab fa-swift"></i> Xcode & Swift</li>
+            <li><a href="#entrance">{{ general.navigation?.top ?? "Intro" }}</a></li>
+            <!-- <li><a href="#skills">{{ general.navigation?.skills ?? "Skills" }}</a></li> -->
+            <li><a href="#projects">{{ general.navigation?.projects ?? "Projects" }}</a></li>
+            <li><a href="#experiences">{{ general.navigation?.experiences ?? "Experiences" }}</a></li>
         </ul>
+    </nav>
+
+    <section id="entrance">
+        <div id="introduction">
+            <div id="head-img">
+                <img src="/images/head.jpg" alt="">
+            </div>
+            <h1 id="name">{{ general.intro?.name ?? "Michael Pan" }}</h1>
+            <h3 id="job">{{ general.intro?.job ?? "Game Programmer" }}</h3>
+
+            <p>{{ general.intro?.about ?? "About me" }}</p>
+
+            <div id="links">
+                <a href="https://www.linkedin.com/in/michael-pan-537034131/" target="_blank"><i class="fab fa-linkedin-in"></i></a>
+                <a href="http://github.com/panmpan17" target="_blank"><i class="fab fa-github"></i></a>
+                <a href="mailto: panmpan@gmail.com"><i class="fas fa-envelope"></i></a>
+                <a href="tel: +886966558397"><i class="fas fa-phone"></i></a>
+            </div>
+        </div>
+
+        <div id="video">
+            <iframe width="100%" height="100%" title="YouTube video player"
+                src="https://www.youtube.com/embed/buWMRzDCdGk?si=nLqGdu5sJJnXi1dh&rel=0&color=white"
+                frameborder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share"
+                referrerpolicy="strict-origin-when-cross-origin" allowfullscreen
+                style="border-radius: 10px;"></iframe>
+        </div>
     </section>
 
-    <section id="school-work-history">
-        <h2>{{school_work_history_text}}</h2>
-        <article v-for="item in school_work_history">
-            <h4 class="position">{{item.position}}</h4>
-            <h5 class="location" v-html="item.location"></h5>
-            <div class="time">{{item.time}}</div>
-            <summary v-html="item.summary"></summary>
+    <section id="projects">
+        <h2 class="title">{{ general.projects?.title ?? "Project" }}</h2>
+        <!-- <div id="tags">
+            <div>C++</div>
+            <div class="active">Python</div>
+        </div> -->
+
+        <article v-for="project in sortedProjects">
+            <div class="thumbnail">
+                <image-carousel :images="project.images"></image-carousel>
+            </div>
+            <div class="details">
+                <div class="container">
+                    <div id="icon">
+                        <template v-for="skill in project.skills">
+                            <div v-html="getSkillIcon(skill)"></div>
+                        </template>
+                    </div>
+                    <div id="text">
+                        <h3 class="title">{{ project.name }}</h3>
+                        <div class="description" v-html="project.summary"></div>
+
+                        <template v-for="(link, platform) in project.links">
+                            <a :href="link" target="_blank">
+                                <i v-bind:class="getPlatformIcon(platform)"></i> {{ platform }}
+                            </a>
+                        </template>
+                    </div>           
+                </div>
+            </div>
         </article>
     </section>
 
-    <script>
-        const { createApp, ref } = Vue;
-        const defaultLanguage = "en-us";
-        const optionalLanguages = [ "zh-tw" ];
+    <section id="experiences">
+        <h2 class="title">{{ general.experiences?.title ?? "Experiences" }}</h2>
 
-        const userLanguage = (navigator.language || navigator.userLanguage).toLowerCase();
+        <article v-for="org in sortedOrganizations">
+            <div class="description">
+                <div class="icon" style="background: white;"><img v-bind:src="org.logo" alt=""></div>
 
+                <div class="summary">
+                    <h4>{{ org.name }}</h4>
+                    <time>{{ org.time.start }} ~ {{ org.time.end }}</time>
+                    <h5 v-html="org.job_title"></h5>
+                    <p v-html="org.summary"></p>
+                </div>
+            </div>
 
-        function View() {
-            let self = this;
-            this.language = defaultLanguage;
+            <div class="linked-projects">
+                <div class="container">
+                    <img v-for="image in org.linked_projects" v-bind:src="image" alt="Project Image">
+                </div>
+                <div class="top-scroll"></div>
+                <div class="bottom-scroll"></div>
+                <div class="left-scroll"></div>
+                <div class="right-scroll"></div>
+            </div>
+        </article>
+    </section>
 
-            if (optionalLanguages.includes(userLanguage))
-                this.language = userLanguage;
-
-            this.pageData = {
-                my_name: ref('Loading...'),
-                profession: ref('Loading...'),
-                summary: ref('Loading...'),
-                location: ref('Loading...'),
-
-                biography_text: ref('Loading...'),
-                biography: ref('Loading...'),
-
-                skill_text: ref('Loading...'),
-
-                school_work_history_text: ref('Loading...'),
-                school_work_history: ref([
-                    {
-                        position: "媒體設計系遊戲組",
-                        location: "大同大學",
-                        time: "Sep 2020 - Present",
-                        summary: "在工作兩年後，來到大同大學來讀書，學習不同的遊戲領域知識和技術，增加人際關係的技巧，保握每次帶領團隊的機會。<br>在學期間，有參加過 4 次教授的 VR 研究計畫，替國中小學的課綱增加 VR 互動體驗。 (其中一個還在開發中，尚未公開)",
-                    },
-                    {
-                        position: "專案實習生",
-                        location: "烴奈股份有限公司",
-                        time: "Aug 2022 - Jul 2023",
-                        summary: "xxx"
-                    },
-                    {
-                        position: "全端程式設計師",
-                        location: "樂學科技股份有限公司 https://coding4fun.tw",
-                        time: "Feb 2020 - Aug 2020",
-                        summary: "樂學科技的理念是推廣兒童程式教育，利用線上課程搭配實體教師，讓孩童掌握課程進度，並在課程卡住時提供及時幫助。<br>主要工作內容是網站開發、維護伺服器，包含了 Database、RESTful API、使用者介面等等。"
-                    },
-                    {
-                        position: "遊戲程式設計師",
-                        location: "不或互動娛樂",
-                        time: "Aug 2018 - Feb 2020",
-                        summary: "獨立遊戲開發公司，主要開發手機以及電腦遊戲。任職期間，參與過 3項專案，深入了解遊戲開發流程，其中「Chef Chen」目前正在 Steam 發售，期間使用過 Unity、Cocos Creator。"
-                    },
-                    {
-                        position: "",
-                        location: "",
-                        time: "",
-                        summary: ""
-                    },
-                ]),
-            };
-
-            this.data = function () {
-                return self.pageData;
-            };
-
-
-
-            Get({
-                url: `language/${this.language}/datas.json`,
-                success: (msg) => {
-                    let json = msg.jsonlizeText();
-
-                    for (var key in json)
-                    {
-                        if (self.pageData[key])
-                        {
-                            self.pageData[key].value = json[key];
-                        }
-                    }
-                },
-            });
-        }
-
-        let app = createApp(new View());
-        app.mount("body");
-    </script>
+    <button id="change-language" v-on:click="changeLanguage">
+        <i class="fas fa-language"></i>
+    </button>
 </body>
 </html>

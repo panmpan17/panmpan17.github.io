@@ -18,8 +18,10 @@
     <link rel="stylesheet" href="css/carousel.css">
 
     <script src="https://unpkg.com/vue@3/dist/vue.global.js"></script>
+    <!-- <script src="https://unpkg.com/vue@3/dist/vue.global.prod.js"></script> -->
     <script src="javascript/carousel.js"></script>
     <script src="javascript/request.js"></script>
+    <script src="javascript/page_data.js"></script>
 
     <style>
         #change-language {
@@ -80,7 +82,8 @@
             <iframe width="100%" height="100%" title="YouTube video player"
                 src="https://www.youtube.com/embed/buWMRzDCdGk?si=nLqGdu5sJJnXi1dh&rel=0&color=white"
                 frameborder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share"
-                referrerpolicy="strict-origin-when-cross-origin" allowfullscreen></iframe>
+                referrerpolicy="strict-origin-when-cross-origin" allowfullscreen
+                style="border-radius: 10px;"></iframe>
         </div>
     </section>
 
@@ -132,8 +135,14 @@
                 </div>
             </div>
 
-            <div class="linked-projects"> <!--  :style="{ 'max-height': this.previousElementSibling.offsetHeight + 'px' }" -->
-                 <img v-for="image in org.linked_projects" v-bind:src="image" alt="Project Image">
+            <div class="linked-projects">
+                <div class="container">
+                    <img v-for="image in org.linked_projects" v-bind:src="image" alt="Project Image">
+                </div>
+                <div class="top-scroll"></div>
+                <div class="bottom-scroll"></div>
+                <div class="left-scroll"></div>
+                <div class="right-scroll"></div>
             </div>
         </article>
     </section>
@@ -141,10 +150,5 @@
     <button id="change-language" v-on:click="changeLanguage">
         <i class="fas fa-language"></i>
     </button>
-
-    <script src="javascript/page_data.js"></script>
-    <script>
-
-    </script>
 </body>
 </html>

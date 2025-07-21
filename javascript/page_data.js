@@ -11,7 +11,40 @@ const PROJECT_IDS = [
 
 const userLanguage = (navigator.language || navigator.userLanguage).toLowerCase();
 
-(function () {
+function resizeAllLinkedProjects() {
+    let linkedProjects = document.querySelectorAll(".linked-projects");
+
+    for (let linkedProject of linkedProjects) {
+        let topScroll = linkedProject.querySelector(".top-scroll");
+        let bottomScroll = linkedProject.querySelector(".bottom-scroll");
+        let leftScroll = linkedProject.querySelector(".left-scroll");
+        let rightScroll = linkedProject.querySelector(".right-scroll");
+
+        if (document.body.offsetWidth < 768) {
+            linkedProject.children[0].style.maxHeight = "none";
+            topScroll.hidden = true;
+            bottomScroll.hidden = true;
+            leftScroll.hidden = false;
+            rightScroll.hidden = false;
+        }
+        else
+        {
+            topScroll.hidden = false;
+            bottomScroll.hidden = false;
+            leftScroll.hidden = true;
+            rightScroll.hidden = true;
+
+            if (linkedProject.previousElementSibling) {
+                linkedProject.children[0].style.maxHeight = linkedProject.previousElementSibling.offsetHeight + "px";
+            }
+            else {
+                linkedProject.children[0].style.maxHeight = "1000px"; // Fallback
+            }
+        }
+    }
+}
+
+function MountApp() {
     const { createApp, ref, computed } = Vue;
 
     function View(defaultLanguage) {
@@ -109,6 +142,7 @@ const userLanguage = (navigator.language || navigator.userLanguage).toLowerCase(
             for (let id of ORGANIZATION_IDS) {
                 if (self.langaugesData[language].organizations[id]) {
                     self.pageData.organizations.value[id] = self.langaugesData[language].organizations[id];
+                    setTimeout(resizeAllLinkedProjects, 100);
                     continue;
                 }
 
@@ -116,7 +150,9 @@ const userLanguage = (navigator.language || navigator.userLanguage).toLowerCase(
                     url: `/page/${self.language.value}/organizations/${id}.json`,
                     success: (response) => {
                         self.langaugesData[language].organizations[id] = response.jsonlizeText();
+                        self.langaugesData[language].organizations[id].ref = ref(null);
                         self.pageData.organizations.value[id] = self.langaugesData[language].organizations[id];
+                        setTimeout(resizeAllLinkedProjects, 100);
                     }
                 });
             }
@@ -181,4 +217,13 @@ const userLanguage = (navigator.language || navigator.userLanguage).toLowerCase(
     }
     let app = createApp(new View(defaultLanguage));
     app.mount("body");
-})();
+};
+
+document.addEventListener("DOMContentLoaded", function () {
+    MountApp();
+});
+
+addEventListener("resize", function () {
+    console.log("Window resized, resizing linked projects...");
+    resizeAllLinkedProjects();
+});

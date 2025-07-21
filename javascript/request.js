@@ -56,8 +56,6 @@ function Get({ url, data, success, error }) {
         url += "?" + stringlizeDictionary(data);
     }
 
-    console.log(`GET ${url}`);
-
     request.open("GET", url, true);
     request.send();
 }
