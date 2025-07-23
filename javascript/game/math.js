@@ -116,6 +116,7 @@ class Vector {
 }
 
 const VectorZero = new Vector(0, 0);
+const VectorUp = new Vector(0, -1);
 
 class Range {
     constructor(min, max) {

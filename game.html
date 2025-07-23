@@ -101,6 +101,57 @@
             }
         }
 
+        class Bullet {
+            constructor(x, y) {
+                this.pos = VectorZero;
+                this.rotation = 0; // In radians
+                this.velocity = VectorZero;
+                this.active = false;
+                this.life = 0;
+            }
+
+            shoot(pos, rotation, velocity) {
+                this.pos = pos;
+                this.rotation = rotation;
+                this.velocity = velocity;
+                this.active = true;
+                this.life = 0;
+            }
+
+            update(gameCanvas, deltaTime) {
+                if (!this.active) {
+                    return;
+                }
+
+                this.pos = this.pos.add(this.velocity.multiply(deltaTime));
+
+                this.life += deltaTime;
+                if (this.life > 3) { // Bullet life time
+                    this.active = false;
+                }
+            }
+
+            draw(gameCanvas) {
+                if (!this.active) {
+                    return;
+                }
+
+                let width = 3;
+                let height = 10;
+                let fillStyle = gameCanvas.context.fillStyle;
+                gameCanvas.context.save();
+                let screenPos = gameCanvas.camera.worldToScreen(this.pos.x, this.pos.y);
+                gameCanvas.context.fillStyle = "yellow";
+                gameCanvas.context.translate(screenPos.x, screenPos.y);
+                gameCanvas.context.rotate(this.rotation);
+                gameCanvas.context.beginPath();
+                gameCanvas.context.rect(-width / 2, -height / 2, width, height);
+                gameCanvas.context.fill();  
+                gameCanvas.context.restore();
+                gameCanvas.context.fillStyle = fillStyle; // Restore original fill style
+            }
+        }
+
         class Ship extends SimpleImageNode {
             constructor(x, y) {
                 super({ image: images.ship, x, y, scale: 0.8 });
@@ -125,9 +176,22 @@
                 this.smokeParticle.particleImageSize = new Range(0.5, 0.8);
                 this.smokeParticle.images = [images.dust1, images.dust2, images.dust3, images.dust4];
                 this.smokeSpawnRange = new Range(0, 30);
+
+                this.bullets = [];
+                for (let i = 0; i < 15; i++) {
+                    this.bullets.push(new Bullet(0, i * -30));
+                }
+                this.fps = 0;
+
+                this.shootBullet = true;
+                this.shootInterval = 0.2; // Time between shots in seconds
+                this.timeSinceLastShot = 0;
+
+                this.bulletSpeed = 500;
             }
 
             update(gameCanvas, deltaTime) {
+                this.fps = 1 / deltaTime;
                 let isMoving = false;
                 if (gameCanvas.mouseDown && gameCanvas.mouseInFrame) {
                     isMoving = this.updateVelocity(gameCanvas, deltaTime);
@@ -145,6 +209,8 @@
                     this.smokeParticle.pos = this.pos.add(this.smokeParticle.childPos.rotate(this.rotation));
                     this.smokeParticle.update(gameCanvas, deltaTime);
                 }
+
+                this.updateBullet(gameCanvas, deltaTime);
             }
 
             updateVelocity(gameCanvas, deltaTime) {
@@ -169,6 +235,26 @@
                 return false;
             }
 
+            updateBullet(gameCanvas, deltaTime) {
+                let shootNewBullet = false;
+                if (this.shootBullet) {
+                    this.timeSinceLastShot += deltaTime;
+                    if (this.timeSinceLastShot >= this.shootInterval) {
+                        shootNewBullet = true;
+                        this.timeSinceLastShot = 0;
+                    }
+                }
+
+                for (let bullet of this.bullets) {
+                    if (!bullet.active && shootNewBullet) {
+                        let bulletVelocity = VectorUp.rotate(this.rotation).multiply(this.bulletSpeed); // Bullet speed
+                        bullet.shoot(this.pos, this.rotation, bulletVelocity);
+                        shootNewBullet = false; // Only shoot one bullet at a time
+                    }
+                    bullet.update(gameCanvas, deltaTime);
+                }
+            }
+
             draw(gameCanvas) {
                 if (this.smokeParticle) {
                     this.smokeParticle.draw(gameCanvas);
@@ -179,13 +265,17 @@
                 drawText(gameCanvas.context, `Pos: ${round(this.pos.x)}, ${round(this.pos.y)}`, 10, 20);
                 drawText(gameCanvas.context, `Vel: ${round(this.velocity.x)}, ${round(this.velocity.y)}`, 10, 40);
                 drawText(gameCanvas.context, `Rot: ${round(this.rotation)}`, 10, 60);
-                drawText(gameCanvas.context, `Smoke: ${round(this.smokeParticle.spawnPerSeconds)}`, 10, 80);
+                drawText(gameCanvas.context, `FPS: ${Math.round(this.fps)}`, 10, 80);
 
                 // let delta = gameCanvas.mousePositionWorld.subtract(this.pos);
 
                 if (gameCanvas.mouseInFrame && gameCanvas.mouseDown) {
                     let screenPos = gameCanvas.camera.worldToScreen(this.cursorCirclePosition.x, this.cursorCirclePosition.y);
                     drawCircle(gameCanvas.context, screenPos.x, screenPos.y, 5, 'red');
+                }
+
+                for (let bullet of this.bullets) {
+                    bullet.draw(gameCanvas);
                 }
             }
 
@@ -205,15 +295,14 @@
         }
 
         class Asteroid extends SimpleImageNode {
-            constructor(x, y, scale) {
-                super({ image: images.asteroid, x: 0, y: 0, scale: 1 });
+            constructor(scale) {
+                super({ image: images.asteroid, x: 0, y: 0, scale });
                 this.velocity = VectorZero;
                 this.active = false;
             }
 
-            setPositionAndVelocity(pos, scale, velocity) {
+            setPositionAndVelocity(pos, velocity) {
                 this.pos = pos;
-                this.scale = scale || 1;
                 this.velocity = velocity;
                 this.rotation = Math.random() * 2 * Math.PI;
             }
@@ -225,11 +314,21 @@
                 this.pos = this.pos.add(this.velocity.multiply(deltaTime));
             }
 
+            getCollisionRadius() {
+                return this.image.width * this.scale / 2 * 0.7;
+            }
+
             draw(gameCanvas) {
                 if (!this.active) {
                     return;
                 }
                 super.draw(gameCanvas);
+
+                // let pos = gameCanvas.camera.worldToScreen(this.pos.x, this.pos.y);
+                // drawWiredCircle(gameCanvas.context, 
+                //     pos.x, 
+                //     pos.y, 
+                //     this.getCollisionRadius(), 'white');
             }
         }
 
@@ -239,14 +338,23 @@
                 this.spawnObjectBorder = spawnObjectBorder;
                 this.despawnObjectBorder = despawnObjectBorder;
 
+                this.largeAsteroids = [];
+                this.smallAsteroids = [];
                 this.asteroids = [];
 
-                for (let i = 0; i < 15; i++) {
-                    this.asteroids.push(new Asteroid());
+                const ASTEROID_COUNT = 6;
+                for (let i = 0; i < ASTEROID_COUNT; i++) {
+                    this.largeAsteroids.push(new Asteroid(1));
+                    this.asteroids.push(this.largeAsteroids[i]);
                 }
+                for (let i = 0; i < ASTEROID_COUNT * 2; i++) {
+                    this.smallAsteroids.push(new Asteroid(0.5));
+                    this.asteroids.push(this.smallAsteroids[i]);
+                }
+
                 this.asteroidRandomSpeed = new Range(50, 100);
                 this.asteroidRandomScale = new Range(0.5, 1.5);
-                this.targetAsteroidCount = 13;
+                this.targetAsteroidCount = 5;
 
                 this.currentAsteroidCount = 0;
             }
@@ -254,13 +362,13 @@
             shouldDespawn(point) {
                 let deltaX = point.x - this.target.pos.x;
                 let deltaY = point.y - this.target.pos.y;
-                return Math.abs(deltaX) <= this.despawnObjectBorder.x / 2 && Math.abs(deltaY) <= this.despawnObjectBorder.y / 2;
+                return !(Math.abs(deltaX) <= this.despawnObjectBorder.x / 2 && Math.abs(deltaY) <= this.despawnObjectBorder.y / 2);
             }
 
             update(gameCanvas, deltaTime) {
                 // console.log(`Current Asteroid Count: ${this.currentAsteroidCount}, Target: ${this.targetAsteroidCount}`);
                 if (this.currentAsteroidCount < this.targetAsteroidCount) {
-                    this.spawnAsteroid(gameCanvas);
+                    this.spawnLargeAsteroid(gameCanvas);
                 }
 
                 for (let i = 0; i < this.asteroids.length; i++) {
@@ -268,37 +376,71 @@
                         this.asteroids[i].update(gameCanvas, deltaTime);
 
                         // Check if the asteroid is outside the despawn border
-                        if (!this.shouldDespawn(this.asteroids[i].pos)) {
+                        if (this.shouldDespawn(this.asteroids[i].pos)) {
                             this.asteroids[i].active = false;
                             this.currentAsteroidCount--;
+                        }
+                        else if (this.checkAsteroidAgainstBullets(this.asteroids[i])) {
+                            this.asteroids[i].active = false;
+                            this.currentAsteroidCount--;
+
+                            if (this.asteroids[i].scale >= 1) {
+                                this.spawnSmallAsteroid(this.asteroids[i].pos, 0.5);
+                                this.spawnSmallAsteroid(this.asteroids[i].pos, 0.5);
+                            }
                         }
                     }
                 }
             }
 
-            spawnAsteroid(gameCanvas) {
-                for (let i = 0; i < this.asteroids.length; i++) {
-                    if (!this.asteroids[i].active) {
-                        let x, y;
-                        if (Math.random() < 0.5) {
-                            x = Math.random() * this.spawnObjectBorder.x + this.target.pos.x - this.spawnObjectBorder.x / 2;
-                            y = Math.random() < 0.5 ? this.target.pos.y - this.spawnObjectBorder.y / 2 : this.target.pos.y + this.spawnObjectBorder.y / 2;
-                        } else {
-                            x = Math.random() < 0.5 ? this.target.pos.x - this.spawnObjectBorder.x / 2 : this.target.pos.x + this.spawnObjectBorder.x / 2;
-                            y = Math.random() * this.spawnObjectBorder.y + this.target.pos.y - this.spawnObjectBorder.y / 2;
+            checkAsteroidAgainstBullets(asteroid) {
+                let asteroidRadius = asteroid.getCollisionRadius();
+                for (let bullet of this.target.bullets) {
+                    if (bullet.active) {
+                        let delta = asteroid.pos.subtract(bullet.pos);
+                        if (delta.sqrMagnitude() < (asteroidRadius * asteroidRadius)) {
+                            // Bullet hit the asteroid
+                            bullet.active = false; // Deactivate the bullet
+                            return true; // Asteroid was hit
+                        }
+
+                    }
+                }
+                return false;
+            }
+
+            spawnLargeAsteroid() {
+                this.spawnAsteroid(this.largeAsteroids);
+                this.currentAsteroidCount++;
+            }
+
+            spawnSmallAsteroid(pos, speedFactor = 1) {
+                this.spawnAsteroid(this.smallAsteroids, pos, speedFactor);
+            }
+
+            spawnAsteroid(asteroidList, pos, speedFactor = 1) {
+                for (let i = 0; i < asteroidList.length; i++) {
+                    if (!asteroidList[i].active) {
+                        if (!pos) {
+                            let x, y;
+                            if (Math.random() < 0.5) {
+                                x = Math.random() * this.spawnObjectBorder.x + this.target.pos.x - this.spawnObjectBorder.x / 2;
+                                y = Math.random() < 0.5 ? this.target.pos.y - this.spawnObjectBorder.y / 2 : this.target.pos.y + this.spawnObjectBorder.y / 2;
+                            } else {
+                                x = Math.random() < 0.5 ? this.target.pos.x - this.spawnObjectBorder.x / 2 : this.target.pos.x + this.spawnObjectBorder.x / 2;
+                                y = Math.random() * this.spawnObjectBorder.y + this.target.pos.y - this.spawnObjectBorder.y / 2;
+                            }
+                            pos = new Vector(x, y);
                         }
 
                         let scale = this.asteroidRandomScale.random();
-                        let velocity = getRandomVector().multiply(this.asteroidRandomSpeed.random());
+                        let velocity = getRandomVector().multiply(this.asteroidRandomSpeed.random() * speedFactor);
 
-                        this.asteroids[i].setPositionAndVelocity(new Vector(x, y), scale, velocity);
-                        this.asteroids[i].active = true;
-
-                        this.currentAsteroidCount++;
+                        asteroidList[i].setPositionAndVelocity(pos, velocity);
+                        asteroidList[i].active = true;
                         return;
                     }
                 }
-                
             }
 
             draw(gameCanvas) {

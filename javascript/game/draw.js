@@ -1,3 +1,12 @@
+function drawWiredCircle(context, x, y, radius, color) {
+    let originalFillStyle = context.fillStyle;
+    context.fillStyle = color;
+    context.beginPath();
+    context.arc(x, y, radius, 0, TWO_PI);
+    context.stroke();
+    context.fillStyle = originalFillStyle;
+}
+
 function drawCircle(context, x, y, radius, color) {
     let originalFillStyle = context.fillStyle;
     context.fillStyle = color;
