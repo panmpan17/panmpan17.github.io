@@ -116,7 +116,15 @@
                 this.drag = 100;
                 this.rotateSpeed = 4;
 
-                this.smokeParticleSystem = null;
+                this.smokeParticle = new ParticleSystem(200);
+                this.smokeParticle.childPos = new Vector(0, 10);
+                // particle.spawnShape = eParticleShape.Square;
+                // particle.spawnShapeSize = 100;
+                // particle.spawnShapeSizeB = 50;
+                this.smokeParticle.particleImage = eParticleImage.Images;
+                this.smokeParticle.particleImageSize = new Range(0.5, 0.8);
+                this.smokeParticle.images = [images.dust1, images.dust2, images.dust3, images.dust4];
+                this.smokeSpawnRange = new Range(0, 30);
             }
 
             update(gameCanvas, deltaTime) {
@@ -132,9 +140,10 @@
 
                 this.pos = this.pos.add(this.velocity.multiply(deltaTime));
 
-                if (this.smokeParticleSystem) {
-                    this.smokeParticleSystem.pos = this.pos;
-                    // this.smokeParticleSystem.update(gameCanvas, deltaTime);
+                if (this.smokeParticle) {
+                    this.smokeParticle.direction = this.rotation + (3.14 / 2); // Rotate to face the direction of movement
+                    this.smokeParticle.pos = this.pos.add(this.smokeParticle.childPos.rotate(this.rotation));
+                    this.smokeParticle.update(gameCanvas, deltaTime);
                 }
             }
 
@@ -150,6 +159,9 @@
                     let targetVelocity = clamedDelta.multiply(this.flySpeed); // Speed factor
                     this.velocity = this.velocity.moveTowards(targetVelocity, this.accelerationSpeed * deltaTime);
 
+                    let speedPercentage = clamedDelta.sqrMagnitude() / (this.clampDistance * this.clampDistance);
+                    this.smokeParticle.spawnPerSeconds = this.smokeSpawnRange.lerp(speedPercentage);
+
                     // TODO: Add effect for drag point
                     return true;
                 }
@@ -158,11 +170,16 @@
             }
 
             draw(gameCanvas) {
+                if (this.smokeParticle) {
+                    this.smokeParticle.draw(gameCanvas);
+                }
+
                 super.draw(gameCanvas);
 
                 drawText(gameCanvas.context, `Pos: ${round(this.pos.x)}, ${round(this.pos.y)}`, 10, 20);
                 drawText(gameCanvas.context, `Vel: ${round(this.velocity.x)}, ${round(this.velocity.y)}`, 10, 40);
                 drawText(gameCanvas.context, `Rot: ${round(this.rotation)}`, 10, 60);
+                drawText(gameCanvas.context, `Smoke: ${round(this.smokeParticle.spawnPerSeconds)}`, 10, 80);
 
                 // let delta = gameCanvas.mousePositionWorld.subtract(this.pos);
 
@@ -174,15 +191,121 @@
 
             onMouseDown(event) {
                 this.mouseDown = true;
-                if (this.smokeParticleSystem) {
-                    this.smokeParticleSystem.spawningEnabled = true;
+                if (this.smokeParticle) {
+                    this.smokeParticle.spawningEnabled = true;
                 }
             }
 
             onMouseUp(event) {
                 this.mouseDown = false;
-                if (this.smokeParticleSystem) {
-                    this.smokeParticleSystem.spawningEnabled = false;
+                if (this.smokeParticle) {
+                    this.smokeParticle.spawningEnabled = false;
+                }
+            }
+        }
+
+        class Asteroid extends SimpleImageNode {
+            constructor(x, y, scale) {
+                super({ image: images.asteroid, x: 0, y: 0, scale: 1 });
+                this.velocity = VectorZero;
+                this.active = false;
+            }
+
+            setPositionAndVelocity(pos, scale, velocity) {
+                this.pos = pos;
+                this.scale = scale || 1;
+                this.velocity = velocity;
+                this.rotation = Math.random() * 2 * Math.PI;
+            }
+
+            update(gameCanvas, deltaTime) {
+                if (!this.active) {
+                    return;
+                }
+                this.pos = this.pos.add(this.velocity.multiply(deltaTime));
+            }
+
+            draw(gameCanvas) {
+                if (!this.active) {
+                    return;
+                }
+                super.draw(gameCanvas);
+            }
+        }
+
+        class Boundary {
+            constructor(target, spawnObjectBorder, despawnObjectBorder) {
+                this.target = target;
+                this.spawnObjectBorder = spawnObjectBorder;
+                this.despawnObjectBorder = despawnObjectBorder;
+
+                this.asteroids = [];
+
+                for (let i = 0; i < 15; i++) {
+                    this.asteroids.push(new Asteroid());
+                }
+                this.asteroidRandomSpeed = new Range(50, 100);
+                this.asteroidRandomScale = new Range(0.5, 1.5);
+                this.targetAsteroidCount = 13;
+
+                this.currentAsteroidCount = 0;
+            }
+
+            shouldDespawn(point) {
+                let deltaX = point.x - this.target.pos.x;
+                let deltaY = point.y - this.target.pos.y;
+                return Math.abs(deltaX) <= this.despawnObjectBorder.x / 2 && Math.abs(deltaY) <= this.despawnObjectBorder.y / 2;
+            }
+
+            update(gameCanvas, deltaTime) {
+                // console.log(`Current Asteroid Count: ${this.currentAsteroidCount}, Target: ${this.targetAsteroidCount}`);
+                if (this.currentAsteroidCount < this.targetAsteroidCount) {
+                    this.spawnAsteroid(gameCanvas);
+                }
+
+                for (let i = 0; i < this.asteroids.length; i++) {
+                    if (this.asteroids[i].active) {
+                        this.asteroids[i].update(gameCanvas, deltaTime);
+
+                        // Check if the asteroid is outside the despawn border
+                        if (!this.shouldDespawn(this.asteroids[i].pos)) {
+                            this.asteroids[i].active = false;
+                            this.currentAsteroidCount--;
+                        }
+                    }
+                }
+            }
+
+            spawnAsteroid(gameCanvas) {
+                for (let i = 0; i < this.asteroids.length; i++) {
+                    if (!this.asteroids[i].active) {
+                        let x, y;
+                        if (Math.random() < 0.5) {
+                            x = Math.random() * this.spawnObjectBorder.x + this.target.pos.x - this.spawnObjectBorder.x / 2;
+                            y = Math.random() < 0.5 ? this.target.pos.y - this.spawnObjectBorder.y / 2 : this.target.pos.y + this.spawnObjectBorder.y / 2;
+                        } else {
+                            x = Math.random() < 0.5 ? this.target.pos.x - this.spawnObjectBorder.x / 2 : this.target.pos.x + this.spawnObjectBorder.x / 2;
+                            y = Math.random() * this.spawnObjectBorder.y + this.target.pos.y - this.spawnObjectBorder.y / 2;
+                        }
+
+                        let scale = this.asteroidRandomScale.random();
+                        let velocity = getRandomVector().multiply(this.asteroidRandomSpeed.random());
+
+                        this.asteroids[i].setPositionAndVelocity(new Vector(x, y), scale, velocity);
+                        this.asteroids[i].active = true;
+
+                        this.currentAsteroidCount++;
+                        return;
+                    }
+                }
+                
+            }
+
+            draw(gameCanvas) {
+                for (let i = 0; i < this.asteroids.length; i++) {
+                    if (this.asteroids[i].active) {
+                        this.asteroids[i].draw(gameCanvas);
+                    }
                 }
             }
         }
@@ -213,30 +336,20 @@
 
                 this.lastTime = null;
 
-                let particle = new ParticleSystem(200);
-                // particle.spawnShape = eParticleShape.Square;
-                // particle.spawnShapeSize = 100;
-                // particle.spawnShapeSizeB = 50;
-                particle.particleImage = eParticleImage.Images;
-                particle.particleImageSize = new Range(0.5, 0.8);
-                particle.images = [images.dust1, images.dust2, images.dust3, images.dust4];
-                particle.interval = 0.02;
-
                 this.ship = new Ship(0, 0);
-                this.ship.smokeParticleSystem = particle;
                 this.followCamera = new FollowCamera({
                     camera: this.camera,
                     target: this.ship
                 });
 
+                this.boundary = new Boundary(
+                    this.ship,
+                    new Vector(this.canvas.width * 1.3, this.canvas.height * 1.3), // Spawn border
+                    new Vector(this.canvas.width * 1.5, this.canvas.height * 1.5) // Despawn border
+                );
+
                 this.children = [
-                    new SimpleImageNode({ image: images.asteroid, x: -100, y: 100, scale: 1.2 }),
-                    new SimpleImageNode({ image: images.asteroid, x: -200, y: 200, scale: 1 }),
-                    new SimpleImageNode({ image: images.asteroid, x: 300, y: -300, scale: 0.8 }),
-                    new SimpleImageNode({ image: images.asteroid, x: 100, y: 400, scale: 0.5 }),
-                    new SimpleImageNode({ image: images.asteroid, x: 200, y: 500, scale: 1 }),
-                    new SimpleImageNode({ image: images.asteroid, x: 300, y: 600, scale: 1.2 }),
-                    particle,
+                    this.boundary,
                     this.ship,
                     this.followCamera,
                 ];

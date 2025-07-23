@@ -43,6 +43,13 @@ function randomInt(min, max) {
     return Math.floor(Math.random() * (max - min + 1)) + min;
 }
 
+function getRandomVector() {
+    let angle = Math.random() * TWO_PI;
+    return new Vector(
+        -Math.sin(angle),
+        Math.cos(angle)
+    );
+}
 
 class Vector {
     constructor(x, y) {
@@ -99,6 +106,13 @@ class Vector {
         }
         return this.add(delta.normalize().multiply(amount));
     }
+
+    rotate(delta) {
+        return new Vector(
+            this.x * Math.cos(delta) - this.y * Math.sin(delta),
+            this.x * Math.sin(delta) + this.y * Math.cos(delta)
+        );
+    }
 }
 
 const VectorZero = new Vector(0, 0);
@@ -119,5 +133,9 @@ class Range {
 
     random() {
         return Math.random() * (this.max - this.min) + this.min;
+    }
+
+    lerp(t) {
+        return this.min + (this.max - this.min) * t;
     }
 }

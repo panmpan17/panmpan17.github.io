@@ -41,9 +41,11 @@ class ParticleSystem {
         this.velocityRange = new Range(40, 80); // Velocity range for particles
         this.lifetimeRange = new Range(1, 4); // Lifetime between 1 and 4 seconds
 
-        this.interval = 0.1; // Interval to spawn particles
+        this.spawnPerSeconds = 10; // Number of particles to spawn per second
         this.timeSinceLastSpawn = 0;
         this.spawningEnabled = false;
+
+        this.direction = null;
 
         this.particles = [];
 
@@ -80,8 +82,21 @@ class ParticleSystem {
 
         // TODO: use argument to control particle velocity
         let randomValue = this.velocityRange.random();
-        let velocityX = (Math.random() - 0.5) * randomValue;
-        let velocityY = (Math.random() - 0.5) * randomValue;
+
+        
+        let velocityX;
+        let velocityY;
+        if (this.direction) {
+            // If direction is set, use it to calculate velocity
+            // let angle = this.direction.getAngleInRadians();
+            velocityX = Math.cos(this.direction) * randomValue;
+            velocityY = Math.sin(this.direction) * randomValue;
+        }
+        else
+        {
+            velocityX = (Math.random() - 0.5) * randomValue;
+            velocityY = (Math.random() - 0.5) * randomValue;
+        }
 
         let lifetime = this.lifetimeRange.random();
         // let opacity = Math.random(); // Random opacity between 0 and 1
@@ -110,7 +125,7 @@ class ParticleSystem {
     update(gameCanvas, deltaTime) {
         if (this.spawningEnabled) {
             this.timeSinceLastSpawn += deltaTime;
-            if (this.timeSinceLastSpawn >= this.interval) {
+            if (this.timeSinceLastSpawn >= (1 / this.spawnPerSeconds)) {
                 this.spawnParticle();
                 this.timeSinceLastSpawn = 0;
             }
