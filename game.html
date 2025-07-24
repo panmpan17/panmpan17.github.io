@@ -13,7 +13,6 @@
         canvas#gameCanvas {
             /* background-color: #f0f0f0; */
             display: block;
-            margin: 0 auto;
             border: 1px solid black;
         }
     </style>
@@ -263,10 +262,10 @@
 
                 super.draw(gameCanvas);
 
-                drawText(gameCanvas.context, `Pos: ${round(this.pos.x)}, ${round(this.pos.y)}`, 10, 20);
-                drawText(gameCanvas.context, `Vel: ${round(this.velocity.x)}, ${round(this.velocity.y)}`, 10, 40);
-                drawText(gameCanvas.context, `Rot: ${round(this.rotation)}`, 10, 60);
-                drawText(gameCanvas.context, `FPS: ${Math.round(this.fps)}`, 10, 80);
+                // drawText(gameCanvas.context, `Pos: ${round(this.pos.x)}, ${round(this.pos.y)}`, 10, 20);
+                // drawText(gameCanvas.context, `Vel: ${round(this.velocity.x)}, ${round(this.velocity.y)}`, 10, 40);
+                // drawText(gameCanvas.context, `Rot: ${round(this.rotation)}`, 10, 60);
+                // drawText(gameCanvas.context, `FPS: ${Math.round(this.fps)}`, 10, 80);
 
                 // let delta = gameCanvas.mousePositionWorld.subtract(this.pos);
 
@@ -441,11 +440,7 @@
                             this.asteroids[i].active = false;
                             this.currentAsteroidCount--;
 
-                            let explosion = gameCanvas.explosionEffectParticle.get();
-                            explosion.pos = this.asteroids[i].pos;
-
-                            let length = explosion.particles.length;
-                            explosion.burst(randomInt(length / 2, length));
+                            gameCanvas.onAsteroidHit(this.asteroids[i].pos, this.asteroids[i].scale);
 
                             if (this.asteroids[i].scale >= 1) {
                                 this.spawnSmallAsteroid(this.asteroids[i].pos, 0.5);
@@ -520,12 +515,10 @@
                 this.canvas = document.getElementById('gameCanvas');
                 this.context = this.canvas.getContext('2d');
 
-                this.camera = new Camera({
-                    x: 0,
-                    y: 0,
-                    width: this.canvas.width,
-                    height: this.canvas.height
-                });
+                const width = window.innerWidth;// * window.devicePixelRatio,
+                const height = window.innerHeight;// * window.devicePixelRatio;
+                this.canvas.width = width - 20;
+                this.canvas.height = height - 20;
 
                 this.canvas.addEventListener('mousedown', this.onMouseDown.bind(this));
                 this.canvas.addEventListener('mouseup', this.onMouseUp.bind(this));
@@ -533,6 +526,19 @@
                 this.canvas.addEventListener('mouseenter', this.onMouseEnter.bind(this));
                 this.canvas.addEventListener('mouseleave', this.onMouseLeave.bind(this));
 
+                this.canvas.addEventListener("touchstart", this.onTouchStart.bind(this));
+                this.canvas.addEventListener("touchmove", this.onTouchMove.bind(this));
+                this.canvas.addEventListener("touchend", this.onTouchEnd.bind(this));
+                this.canvas.addEventListener("touchcancel", this.onTouchCancel.bind(this));
+            }
+
+            setup() {
+                this.camera = new Camera({
+                    x: 0,
+                    y: 0,
+                    width: this.canvas.width,
+                    height: this.canvas.height
+                });
 
                 this.mouseInFrame = false;
                 this.mousePosition = new Vector(0, 0);
@@ -546,6 +552,8 @@
                     camera: this.camera,
                     target: this.ship
                 });
+
+                this.score = 0;
 
                 this.boundary = new Boundary(
                     this.ship,
@@ -580,10 +588,7 @@
                 this.lastTime = Date.now();
                 setInterval(() => {
                     this.update();
-                    this.context.clearRect(0, 0, this.canvas.width, this.canvas.height);
-                    for (let i = 0; i < this.children.length; i++) {
-                        this.children[i].draw(this);
-                    }
+                    this.draw();
                 }, 1000 / FPS);
             }
 
@@ -597,6 +602,16 @@
                 }
 
                 this.lastTime = now;
+            }
+
+            draw() {
+                this.context.clearRect(0, 0, this.canvas.width, this.canvas.height);
+
+                for (let i = 0; i < this.children.length; i++) {
+                    this.children[i].draw(this);
+                }
+
+                drawText(this.context, `Score ${this.score}`, 10, 20);
             }
 
             onMouseEnter(event) {
@@ -627,6 +642,55 @@
             onCameraMove(event) {
                 this.mousePositionWorld = this.camera.screenToWorld(this.mousePosition.x, this.mousePosition.y);
             }
+
+            onTouchStart(event) {
+                event.preventDefault();
+                this.mouseDown = true;
+                this.mouseInFrame = true;
+
+                for (let i = 0; i < this.children.length; i++) {
+                    this.children[i].onMouseDown && this.children[i].onMouseDown(event);
+                }
+            }
+            onTouchMove(event) {
+                event.preventDefault();
+                if (event.touches.length > 0) {
+                    let touch = event.touches[0];
+                    this.mousePosition.x = touch.clientX - this.canvas.getBoundingClientRect().left;
+                    this.mousePosition.y = touch.clientY - this.canvas.getBoundingClientRect().top;
+                    this.mousePositionWorld = this.camera.screenToWorld(this.mousePosition.x, this.mousePosition.y);
+                }
+                for (let i = 0; i < this.children.length; i++) {
+                    this.children[i].onMouseMove && this.children[i].onMouseMove(event);
+                }
+            }
+            onTouchEnd(event) {
+                event.preventDefault();
+                this.mouseDown = false;
+
+                for (let i = 0; i < this.children.length; i++) {
+                    this.children[i].onMouseUp && this.children[i].onMouseUp(event);
+                }
+            }
+            onTouchCancel(event) {
+                event.preventDefault();
+                this.mouseDown = false;
+                this.mouseInFrame = false;
+                for (let i = 0; i < this.children.length; i++) {
+                    this.children[i].onMouseLeave && this.children[i].onMouseLeave(event);
+                }
+            }
+
+            onAsteroidHit(pos, scale) {
+                // alert(`Asteroid hit at ${pos.x}, ${pos.y} with scale ${scale}`);
+                this.score += Math.round(scale * 10); // Increase score based on asteroid size
+
+                let explosion = this.explosionEffectParticle.get();
+                explosion.pos = pos;
+
+                let length = explosion.particles.length;
+                explosion.burst(randomInt(length / 2, length));
+            }
         }
 
         (function() {
@@ -643,6 +707,7 @@
             ]).then(() => {
                 console.log('All images loaded successfully');
                 gameCanvas = new GameCanvas();
+                gameCanvas.setup();
                 gameCanvas.start();
             }).catch(error => {
                 console.error(error);
