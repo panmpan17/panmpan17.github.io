@@ -25,6 +25,7 @@
     <script src="/javascript/game/draw.js"></script>
     <script src="/javascript/game/particle.js"></script>
     <script>
+        let gameCanvas = null;
         let images = {};
         let FPS = 60;
 
@@ -332,6 +333,62 @@
             }
         }
 
+        class ObjectPool {
+            constructor(createFunc, initCount = 10) {
+                this.createFunc = createFunc;
+                this.pool = [];
+                for (let i = 0; i < initCount; i++) {
+                    this.pool.push(this.createFunc());
+                }
+            }
+
+            get() {
+                for (let i = 0; i < this.pool.length; i++) {
+                    if (!this.pool[i].active) {
+                        return this.pool[i];
+                    }
+                }
+                return this.createFunc();
+            }
+
+            release(item) {
+                this.pool.push(item);
+            }
+        }
+
+        class EffectsPool extends ObjectPool {
+            constructor(createFunc, initCount = 10) {
+                super(createFunc, initCount);
+            }
+
+            get () {
+                for (let i = 0; i < this.pool.length; i++) {
+                    if (this.pool[i].lifeTimer >= this.pool[i].lifeTime) {
+                        return this.pool[i];
+                    }
+                }
+                let particle = this.createFunc();
+                this.pool.push(particle);
+                return particle;
+            }
+
+            update (gameCanvas, deltaTime) {
+                for (let item of this.pool) {
+                    // if (item.lifeTime == 0 || item.lifeTimer < item.lifeTime) {
+                        item.update(gameCanvas, deltaTime);
+                    // }
+                }
+            }
+
+            draw(gameCanvas) {
+                for (let item of this.pool) {
+                    // if (item.lifeTime == 0 || item.lifeTimer < item.lifeTime) {
+                    item.draw(gameCanvas);
+                    // }
+                }
+            }
+        }
+
         class Boundary {
             constructor(target, spawnObjectBorder, despawnObjectBorder) {
                 this.target = target;
@@ -383,6 +440,12 @@
                         else if (this.checkAsteroidAgainstBullets(this.asteroids[i])) {
                             this.asteroids[i].active = false;
                             this.currentAsteroidCount--;
+
+                            let explosion = gameCanvas.explosionEffectParticle.get();
+                            explosion.pos = this.asteroids[i].pos;
+
+                            let length = explosion.particles.length;
+                            explosion.burst(randomInt(length / 2, length));
 
                             if (this.asteroids[i].scale >= 1) {
                                 this.spawnSmallAsteroid(this.asteroids[i].pos, 0.5);
@@ -490,7 +553,23 @@
                     new Vector(this.canvas.width * 1.5, this.canvas.height * 1.5) // Despawn border
                 );
 
+                this.explosionEffectParticle = new EffectsPool(() => {
+                    let burstParticle = new ParticleSystem(15);
+                    burstParticle.spawningEnabled = true;
+                    burstParticle.pos = VectorZero;
+                    burstParticle.particleImage = eParticleImage.Rect;
+                    burstParticle.particleImageSize = new Range(15, 25);
+                    burstParticle.spawnPerSeconds = 0;
+                    burstParticle.velocityRange = new Range(300, 350); // Velocity range for particles
+                    burstParticle.lifetimeRange = new Range(1, 2); // Lifetime between 1 and 2 seconds
+                    burstParticle.opacityRange = new Range(0.8, 1); // Opacity range for particles
+                    burstParticle.lifeTime = 2;
+                    burstParticle.color = "#9BADB7";
+                    return burstParticle;
+                }, 20);
+
                 this.children = [
+                    this.explosionEffectParticle,
                     this.boundary,
                     this.ship,
                     this.followCamera,
@@ -563,7 +642,7 @@
                 // Add more images as needed
             ]).then(() => {
                 console.log('All images loaded successfully');
-                var gameCanvas = new GameCanvas();
+                gameCanvas = new GameCanvas();
                 gameCanvas.start();
             }).catch(error => {
                 console.error(error);

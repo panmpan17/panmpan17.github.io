@@ -7,6 +7,7 @@ const eParticleShape = {
 const eParticleImage = {
     Circle: 0,
     Images: 1,
+    Rect: 2,
 };
 
 
@@ -35,15 +36,21 @@ class ParticleSystem {
         this.spawnShapeSizeB = 1;
 
         this.particleImage = eParticleImage.Circle;
-        this.particleImageSize = 5;
+        this.particleImageSize = new Range(5, 5);
         this.images = [];
+        this.color = "white"; // Default color for particles
 
         this.velocityRange = new Range(40, 80); // Velocity range for particles
         this.lifetimeRange = new Range(1, 4); // Lifetime between 1 and 4 seconds
+        this.opacityRange = new Range(0.5, 1); // Opacity range for particles
 
         this.spawnPerSeconds = 10; // Number of particles to spawn per second
         this.timeSinceLastSpawn = 0;
         this.spawningEnabled = false;
+
+        this.lifeTime = 0;
+        this.lifeTimer = 0;
+        this.lifeTimeFinishFunc = null;
 
         this.direction = null;
 
@@ -51,6 +58,16 @@ class ParticleSystem {
 
         for (let i = 0; i < particleCount; i++) {
             this.particles.push(new Particle());
+        }
+    }
+
+    burst(count = undefined) {
+        if (count === undefined) {
+            count = this.particles.length;
+        }
+        this.lifeTimer = 0;
+        for (let i = 0; i < count; i++) {
+            this.spawnParticle();
         }
     }
 
@@ -110,12 +127,12 @@ class ParticleSystem {
                 particle.rotation = Math.random() * 2 * Math.PI; // Random rotation
                 particle.lifetime = lifetime;
                 particle.lifetimeLeft = lifetime; // Reset lifetime
-                particle.opacity = Math.random();; // Reset scale
+                particle.opacity = this.opacityRange.random(); // Reset scale
+                particle.scale = this.particleImageSize.random();
 
                 if (this.particleImage === eParticleImage.Images && this.images.length > 0) {
                     // Randomly select an image index
                     particle.imageIndex = randomInt(0, this.images.length - 1);
-                    particle.scale = this.particleImageSize.random();
                 }
                 return;
             }
@@ -123,7 +140,18 @@ class ParticleSystem {
     }
 
     update(gameCanvas, deltaTime) {
-        if (this.spawningEnabled) {
+        if (this.lifeTime > 0) {
+            this.lifeTimer += deltaTime;
+            if (this.lifeTimer >= this.lifeTime) {
+                if (this.lifeTimeFinishFunc) {
+                    this.lifeTimeFinishFunc(this);
+                    this.lifeTimeFinishFunc = null;
+                }
+                return;
+            }
+        }
+
+        if (this.spawningEnabled && this.spawnPerSeconds > 0) {
             this.timeSinceLastSpawn += deltaTime;
             if (this.timeSinceLastSpawn >= (1 / this.spawnPerSeconds)) {
                 this.spawnParticle();
@@ -143,13 +171,22 @@ class ParticleSystem {
     }
 
     draw(gameCanvas) {
+        if (this.lifeTime > 0 && this.lifeTimer >= this.lifeTime) {
+            return;
+        }
+
+        let globalAlpha = gameCanvas.context.globalAlpha;
         for (let particle of this.particles) {
             if (particle.lifetimeLeft > 0) {
                 let pos = gameCanvas.camera.worldToScreen(particle.x, particle.y);
+                gameCanvas.context.globalAlpha = lerp(particle.opacity, 0, 1 - particle.lifetimeLeft / particle.lifetime);
 
                 switch (this.particleImage) {
                     case eParticleImage.Circle:
-                        drawCircle(gameCanvas.context, pos.x, pos.y, this.particleImageSize, 'rgba(255, 255, 255, ' + particle.opacity + ')');
+                        drawCircle(gameCanvas.context, pos.x, pos.y, this.scale, this.color);
+                        break;
+                    case eParticleImage.Rect:
+                        drawRect(gameCanvas.context, pos.x, pos.y, particle.scale, particle.scale, this.color, particle.rotation);
                         break;
                     case eParticleImage.Images:
                         // If you want to use images, you can add logic here
@@ -160,12 +197,12 @@ class ParticleSystem {
                         gameCanvas.context.save();
                         gameCanvas.context.translate(pos.x, pos.y);
                         gameCanvas.context.rotate(particle.rotation);
-                        gameCanvas.context.globalAlpha = lerp(particle.opacity, 0, 1 - particle.lifetimeLeft / particle.lifetime);
                         gameCanvas.context.drawImage(image, -width / 2, -height / 2, width, height);
                         gameCanvas.context.restore();
                         break;
                 }
             }
         }
+        gameCanvas.context.globalAlpha = globalAlpha;
     }
 }
