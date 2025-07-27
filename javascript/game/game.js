@@ -70,7 +70,7 @@ class Bullet {
 
 class Ship extends SimpleImageNode {
     constructor(x, y) {
-        super({ image: images.ship, x, y, scale: 0.8 });
+        super({ image: images.ship, x, y, scale: 0.6 });
 
         this.velocity = new Vector(0, 0);
         this.mouseDown = false;
@@ -84,7 +84,7 @@ class Ship extends SimpleImageNode {
         this.rotateSpeed = 4;
 
         this.smokeParticle = new ParticleSystem(200);
-        this.smokeParticle.childPos = new Vector(0, 10);
+        this.smokeParticle.childPos = new Vector(0, 40);
         // particle.spawnShape = eParticleShape.Square;
         // particle.spawnShapeSize = 100;
         // particle.spawnShapeSizeB = 50;
@@ -93,23 +93,26 @@ class Ship extends SimpleImageNode {
         this.smokeParticle.images = [images.dust1, images.dust2, images.dust3, images.dust4];
         this.smokeSpawnRange = new Range(0, 30);
 
+        this.bulletPosition = new Vector(0, -20);
         this.bullets = [];
         for (let i = 0; i < 15; i++) {
             this.bullets.push(new Bullet(0, i * -30));
         }
-        this.fps = 0;
 
-        this.shootBullet = true;
+        this.fire = new ShipFire();
+        this.fire.childPos = new Vector(0, 20);
+        this.fire.scale = 0;
+
+        this.shootBullet = false;
         this.shootInterval = 0.2; // Time between shots in seconds
         this.timeSinceLastShot = 0;
 
-        this.bulletSpeed = 500;
+        this.bulletSpeed = 600;
     }
 
     update(gameCanvas, deltaTime) {
-        this.fps = 1 / deltaTime;
         let isMoving = false;
-        if (gameCanvas.mouseDown && gameCanvas.mouseInFrame) {
+        if (gameCanvas.mouseDown) {
             isMoving = this.updateVelocity(gameCanvas, deltaTime);
         }
 
@@ -122,9 +125,11 @@ class Ship extends SimpleImageNode {
 
         if (this.smokeParticle) {
             this.smokeParticle.direction = this.rotation + (3.14 / 2); // Rotate to face the direction of movement
-            this.smokeParticle.pos = this.pos.add(this.smokeParticle.childPos.rotate(this.rotation));
+            this.smokeParticle.pos = this.translate(this.smokeParticle.childPos);
             this.smokeParticle.update(gameCanvas, deltaTime);
         }
+
+        this.fire.update(gameCanvas, deltaTime);
 
         this.updateBullet(gameCanvas, deltaTime);
     }
@@ -144,8 +149,13 @@ class Ship extends SimpleImageNode {
             let speedPercentage = clamedDelta.sqrMagnitude() / (this.clampDistance * this.clampDistance);
             this.smokeParticle.spawnPerSeconds = this.smokeSpawnRange.lerp(speedPercentage);
 
+            this.fire.scale = speedPercentage;
+
             // TODO: Add effect for drag point
             return true;
+        }
+        else {
+            this.fire.scale = 0; // Hide fire when not moving
         }
 
         return false;
@@ -164,7 +174,7 @@ class Ship extends SimpleImageNode {
         for (let bullet of this.bullets) {
             if (!bullet.active && shootNewBullet) {
                 let bulletVelocity = VectorUp.rotate(this.rotation).multiply(this.bulletSpeed); // Bullet speed
-                bullet.shoot(this.pos, this.rotation, bulletVelocity);
+                bullet.shoot(this.translate(this.bulletPosition), this.rotation, bulletVelocity);
                 shootNewBullet = false; // Only shoot one bullet at a time
             }
             bullet.update(gameCanvas, deltaTime);
@@ -176,37 +186,98 @@ class Ship extends SimpleImageNode {
             this.smokeParticle.draw(gameCanvas);
         }
 
+        for (let bullet of this.bullets) {
+            bullet.draw(gameCanvas);
+        }
+
+        if (this.fire.scale > 0) {
+            this.fire.pos = this.translate(this.fire.childPos);
+            this.fire.rotation = this.rotation;
+            this.fire.draw(gameCanvas);
+        }
+
         super.draw(gameCanvas);
 
         // drawText(gameCanvas.context, `Pos: ${round(this.pos.x)}, ${round(this.pos.y)}`, 10, 20);
         // drawText(gameCanvas.context, `Vel: ${round(this.velocity.x)}, ${round(this.velocity.y)}`, 10, 40);
         // drawText(gameCanvas.context, `Rot: ${round(this.rotation)}`, 10, 60);
-        // drawText(gameCanvas.context, `FPS: ${Math.round(this.fps)}`, 10, 80);
 
-        // let delta = gameCanvas.mousePositionWorld.subtract(this.pos);
-
-        if (gameCanvas.mouseInFrame && gameCanvas.mouseDown) {
+        if (gameCanvas.mouseDown) {
             let screenPos = gameCanvas.camera.worldToScreen(this.cursorCirclePosition.x, this.cursorCirclePosition.y);
             drawCircle(gameCanvas.context, screenPos.x, screenPos.y, 5, 'red');
-        }
-
-        for (let bullet of this.bullets) {
-            bullet.draw(gameCanvas);
         }
     }
 
     onMouseDown(event) {
+        this.shootBullet = true;
         this.mouseDown = true;
+        this.fire.scale = 1;
         if (this.smokeParticle) {
             this.smokeParticle.spawningEnabled = true;
         }
     }
 
     onMouseUp(event) {
+        this.shootBullet = false;
         this.mouseDown = false;
+
+        this.fire.scale = 0;
         if (this.smokeParticle) {
             this.smokeParticle.spawningEnabled = false;
         }
+    }
+}
+
+class ShipFire {
+    constructor() {
+        this.pos = VectorZero;
+        this.scale = 1;
+        this.rotation = 1;
+
+        let fireImage = new SimpleImageNode({
+            image: images.fire, x: 0, y: 0, anchor: new Vector(0.5, 0)
+        });
+        fireImage.separateScale = new Vector(1, 1); // Scale for width and height separately
+        this.fire1 = new AnimationNode(fireImage);
+        this.fire1.updateAnimation = (node, progress) => {
+            node.pos = this.pos;
+            node.rotation = this.rotation;
+            node.separateScale.y = this.scale * lerp(1, 2, randomInt(0, 100) / 100);
+        };
+
+        let fireImage2 = fireImage.clone();
+        fireImage2.separateScale = new Vector(0.8, 0.8); // Scale for width and height separately
+        this.fire2 = new AnimationNode(fireImage2);
+        this.fire2.updateAnimation = (node, progress) => {
+            node.pos = this.translate(new Vector(4, 0));
+            node.rotation = this.rotation;
+            node.separateScale.y = this.scale * lerp(0.8, 1.2, randomInt(0, 100) / 100);
+        };
+
+        let fireImage3 = fireImage.clone();
+        fireImage3.separateScale = new Vector(0.8, 0.8); // Scale for width and height separately
+        this.fire3 = new AnimationNode(fireImage3);
+        this.fire3.updateAnimation = (node, progress) => {
+            node.pos = this.translate(new Vector(-4, 0));
+            node.rotation = this.rotation;
+            node.separateScale.y = this.scale * lerp(0.8, 1.2, randomInt(0, 100) / 100);
+        };
+    }
+
+    update(gameCanvas, deltaTime) {
+        this.fire1.update(gameCanvas, deltaTime);
+        this.fire2.update(gameCanvas, deltaTime);
+        this.fire3.update(gameCanvas, deltaTime);
+    }
+
+    draw(gameCanvas) {
+        this.fire1.draw(gameCanvas);
+        this.fire2.draw(gameCanvas);
+        this.fire3.draw(gameCanvas);
+    }
+
+    translate(childPos) {
+        return this.pos.add(childPos.rotate(this.rotation));
     }
 }
 
@@ -258,13 +329,15 @@ class Boundary {
         this.smallAsteroids = [];
         this.asteroids = [];
 
+        this.FULL_ASTEROID_SIZE = 0.8;
+
         const ASTEROID_COUNT = 6;
         for (let i = 0; i < ASTEROID_COUNT; i++) {
-            this.largeAsteroids.push(new Asteroid(1));
+            this.largeAsteroids.push(new Asteroid(this.FULL_ASTEROID_SIZE));
             this.asteroids.push(this.largeAsteroids[i]);
         }
         for (let i = 0; i < ASTEROID_COUNT * 2; i++) {
-            this.smallAsteroids.push(new Asteroid(0.5));
+            this.smallAsteroids.push(new Asteroid(this.FULL_ASTEROID_SIZE / 2));
             this.asteroids.push(this.smallAsteroids[i]);
         }
 
@@ -302,7 +375,7 @@ class Boundary {
 
                     gameCanvas.onAsteroidHit(this.asteroids[i].pos, this.asteroids[i].scale);
 
-                    if (this.asteroids[i].scale >= 1) {
+                    if (this.asteroids[i].scale >= this.FULL_ASTEROID_SIZE) {
                         this.spawnSmallAsteroid(this.asteroids[i].pos, 0.5);
                         this.spawnSmallAsteroid(this.asteroids[i].pos, 0.5);
                     }
@@ -444,7 +517,8 @@ class Game extends GameCanvas {
     }
 
     drawUI() {
-        drawText(this.context, `Score ${this.score}`, 10, 20);
+        drawText(this.context, `FPS: ${Math.round(this.fps)}`, 10, 20);
+        drawText(this.context, `Score: ${this.score}`, 10, 40);
     }
 
     onMouseEnter(event) {
@@ -525,24 +599,3 @@ class Game extends GameCanvas {
         explosion.burst(randomInt(length / 2, length));
     }
 }
-
-(function() {
-
-    // Load images
-    Promise.all([
-        loadImage('ship', '/images/game/ship.png'),
-        loadImage('asteroid', '/images/game/stone.png'),
-        loadImage('dust1', '/images/game/dust_1.png'),
-        loadImage('dust2', '/images/game/dust_2.png'),
-        loadImage('dust3', '/images/game/dust_3.png'),
-        loadImage('dust4', '/images/game/dust_4.png'),
-        // Add more images as needed
-    ]).then(() => {
-        console.log('All images loaded successfully');
-        game = new Game();
-        game.setup();
-        game.start();
-    }).catch(error => {
-        console.error(error);
-    });
-})();

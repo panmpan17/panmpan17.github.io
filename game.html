@@ -25,5 +25,33 @@
     <script src="/javascript/game/particle.js"></script>
     <script src="/javascript/game/foundation.js"></script>
     <script src="/javascript/game/game.js"></script>
+    <!-- <script src="/javascript/game/test_ground.js"></script> -->
+
+    <script>
+        (function() {
+            // Load images
+            Promise.all([
+                loadImage('ship', '/images/game/ship.png'),
+                loadImage('asteroid', '/images/game/asteroid.png'),
+                loadImage('dust1', '/images/game/dust_1.png'),
+                loadImage('dust2', '/images/game/dust_2.png'),
+                loadImage('dust3', '/images/game/dust_3.png'),
+                loadImage('dust4', '/images/game/dust_4.png'),
+                loadImage('fire', '/images/game/fire.png'),
+                // Add more images as needed
+            ]).then(() => {
+                console.log('All images loaded successfully');
+                game = new Game();
+                game.setup();
+                game.start();
+
+                // let testing = new TestingGround();
+                // testing.setup();
+                // testing.start();
+            }).catch(error => {
+                console.error(error);
+            });
+        })();
+    </script>
 </body>
 </html>

@@ -4,6 +4,10 @@ function lerp(start, end, t) {
     return start + (end - start) * t;
 }
 
+function clamp(value, min, max) {
+    return Math.max(min, Math.min(max, value));
+}
+
 function round(number, precision = 2) {
     let factor = Math.pow(10, precision);
     return Math.round(number * factor) / factor;
@@ -117,6 +121,9 @@ class Vector {
 
 const VectorZero = new Vector(0, 0);
 const VectorUp = new Vector(0, -1);
+const VectorDown = new Vector(0, 1);
+const VectorLeft = new Vector(-1, 0);
+const VectorRight = new Vector(1, 0);
 
 class Range {
     constructor(min, max) {
