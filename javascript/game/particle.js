@@ -205,4 +205,14 @@ class ParticleSystem {
         }
         gameCanvas.context.globalAlpha = globalAlpha;
     }
+
+    reset() {
+        this.timeSinceLastSpawn = 0;
+        this.lifeTimer = 0;
+        this.spawningEnabled = false;
+
+        for (let particle of this.particles) {
+            particle.lifetimeLeft = 0; // Reset all particles
+        }
+    }
 }

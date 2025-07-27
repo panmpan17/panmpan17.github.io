@@ -1,5 +1,7 @@
 let game = null;
 
+const CollisionColor = 'lightgreen';
+
 class FollowCamera {
     constructor({ camera, target }) {
         this.camera = camera;
@@ -108,9 +110,32 @@ class Ship extends SimpleImageNode {
         this.timeSinceLastShot = 0;
 
         this.bulletSpeed = 600;
+
+        this.opacity = 1;
+        this.invincibleTime = 3; // Time in seconds
+        this.invincibleTimer = this.invincibleTime;
+        this.invincibleBlink = new PingPongTimer(0.3);
+
+        this.active = true;
+    }
+
+    getIsInvincible() {
+        return this.invincibleTimer < this.invincibleTime;
+    }
+
+    getCollisionCenter() {
+        return this.translate(new Vector(0, 10));
+    }
+
+    getCollisionRadius() {
+        return this.image.width * this.scale / 2 * 0.4;
     }
 
     update(gameCanvas, deltaTime) {
+        if (!this.active) {
+            return;
+        }
+
         let isMoving = false;
         if (gameCanvas.mouseDown) {
             isMoving = this.updateVelocity(gameCanvas, deltaTime);
@@ -132,6 +157,19 @@ class Ship extends SimpleImageNode {
         this.fire.update(gameCanvas, deltaTime);
 
         this.updateBullet(gameCanvas, deltaTime);
+
+        if (this.getIsInvincible()) {
+            this.invincibleTimer += deltaTime;
+
+            if (this.invincibleTimer >= this.invincibleTime) {
+                this.invincibleTimer = this.invincibleTime; // Clamp to max time
+                this.opacity = 1; // Reset opacity when invincibility ends
+            }
+            else {
+                this.invincibleBlink.update(deltaTime);
+                this.opacity = lerp(0.4, 0.7, this.invincibleBlink.getProgress());
+            }
+        }
     }
 
     updateVelocity(gameCanvas, deltaTime) {
@@ -182,6 +220,10 @@ class Ship extends SimpleImageNode {
     }
 
     draw(gameCanvas) {
+        if (!this.active) {
+            return;
+        }
+
         if (this.smokeParticle) {
             this.smokeParticle.draw(gameCanvas);
         }
@@ -196,11 +238,23 @@ class Ship extends SimpleImageNode {
             this.fire.draw(gameCanvas);
         }
 
+        let globalAlpha = gameCanvas.context.globalAlpha;
+        gameCanvas.context.globalAlpha = this.opacity;
         super.draw(gameCanvas);
+        gameCanvas.context.globalAlpha = globalAlpha;
 
         // drawText(gameCanvas.context, `Pos: ${round(this.pos.x)}, ${round(this.pos.y)}`, 10, 20);
         // drawText(gameCanvas.context, `Vel: ${round(this.velocity.x)}, ${round(this.velocity.y)}`, 10, 40);
         // drawText(gameCanvas.context, `Rot: ${round(this.rotation)}`, 10, 60);
+
+        if (gameCanvas.drawGizmos) {
+            let center = this.getCollisionCenter();
+            let pos = gameCanvas.camera.worldToScreen(center.x, center.y);
+            drawWiredCircle(gameCanvas.context, 
+                pos.x, 
+                pos.y, 
+                this.getCollisionRadius(), CollisionColor);
+        }
 
         if (gameCanvas.mouseDown) {
             let screenPos = gameCanvas.camera.worldToScreen(this.cursorCirclePosition.x, this.cursorCirclePosition.y);
@@ -208,9 +262,25 @@ class Ship extends SimpleImageNode {
         }
     }
 
+    activateInvincibility() {
+        this.invincibleTimer = 0;
+        this.invincibleBlink.reset();
+    }
+
+    onGameOver() {
+        this.active = false;
+        this.shootBullet = false;
+        this.mouseDown = false;
+        this.smokeParticle.reset();
+    }
+
     onMouseDown(event) {
-        this.shootBullet = true;
-        this.mouseDown = true;
+        if (!this.active) {
+            return;
+        }
+
+        // this.shootBullet = true;
+        // this.mouseDown = true;
         this.fire.scale = 1;
         if (this.smokeParticle) {
             this.smokeParticle.spawningEnabled = true;
@@ -218,6 +288,10 @@ class Ship extends SimpleImageNode {
     }
 
     onMouseUp(event) {
+        if (!this.active) {
+            return;
+        }
+
         this.shootBullet = false;
         this.mouseDown = false;
 
@@ -301,6 +375,10 @@ class Asteroid extends SimpleImageNode {
         this.pos = this.pos.add(this.velocity.multiply(deltaTime));
     }
 
+    getCollisionCenter() {
+        return this.translate(new Vector(0, 10));
+    }
+
     getCollisionRadius() {
         return this.image.width * this.scale / 2 * 0.7;
     }
@@ -311,11 +389,14 @@ class Asteroid extends SimpleImageNode {
         }
         super.draw(gameCanvas);
 
-        // let pos = gameCanvas.camera.worldToScreen(this.pos.x, this.pos.y);
-        // drawWiredCircle(gameCanvas.context, 
-        //     pos.x, 
-        //     pos.y, 
-        //     this.getCollisionRadius(), 'white');
+        if (gameCanvas.drawGizmos) {
+            let center = this.getCollisionCenter();
+            let pos = gameCanvas.camera.worldToScreen(center.x, center.y);
+            drawWiredCircle(gameCanvas.context, 
+                pos.x, 
+                pos.y, 
+                this.getCollisionRadius(), CollisionColor);
+        }
     }
 }
 
@@ -380,6 +461,9 @@ class Boundary {
                         this.spawnSmallAsteroid(this.asteroids[i].pos, 0.5);
                     }
                 }
+                else if (this.checkAsteroidAgainstShip(this.asteroids[i], gameCanvas.ship)) {
+                    gameCanvas.onShipHit(this.asteroids[i].pos, this.asteroids[i].scale);
+                }
             }
         }
     }
@@ -388,7 +472,8 @@ class Boundary {
         let asteroidRadius = asteroid.getCollisionRadius();
         for (let bullet of this.target.bullets) {
             if (bullet.active) {
-                let delta = asteroid.pos.subtract(bullet.pos);
+                let center = asteroid.getCollisionCenter();
+                let delta = center.subtract(bullet.pos);
                 if (delta.sqrMagnitude() < (asteroidRadius * asteroidRadius)) {
                     // Bullet hit the asteroid
                     bullet.active = false; // Deactivate the bullet
@@ -398,6 +483,17 @@ class Boundary {
             }
         }
         return false;
+    }
+
+    checkAsteroidAgainstShip(asteroid, ship) {
+        if (ship.getIsInvincible()) return false;
+
+        let combinedRadius = asteroid.getCollisionRadius() + ship.getCollisionRadius();
+        let delta = asteroid.getCollisionCenter().subtract(ship.getCollisionCenter());
+        if (delta.sqrMagnitude() < (combinedRadius * combinedRadius)) {
+            return true; // Ship was hit
+        }
+        return false; // Ship was not hit
     }
 
     spawnLargeAsteroid() {
@@ -486,19 +582,26 @@ class Game extends GameCanvas {
         });
 
         this.score = 0;
+        this.scoreElement = document.getElementById('score');
+        if (this.scoreElement) {
+            this.scoreElement.innerText = `${this.score}`;
+        }
+
+        this.life = 3;
 
         this.boundary = new Boundary(
             this.ship,
-            new Vector(this.canvas.width * 1.3, this.canvas.height * 1.3), // Spawn border
-            new Vector(this.canvas.width * 1.5, this.canvas.height * 1.5) // Despawn border
+            new Vector(this.canvas.width * 1.5, this.canvas.height * 1.5), // Spawn border
+            new Vector(this.canvas.width * 1.8, this.canvas.height * 1.8) // Despawn border
         );
 
         this.explosionEffectParticle = new EffectsPool(() => {
-            let burstParticle = new ParticleSystem(15);
+            let burstParticle = new ParticleSystem(12);
             burstParticle.spawningEnabled = true;
             burstParticle.pos = VectorZero;
-            burstParticle.particleImage = eParticleImage.Rect;
-            burstParticle.particleImageSize = new Range(15, 25);
+            burstParticle.particleImage = eParticleImage.Images;
+            burstParticle.images = [images.asteroidBit];
+            burstParticle.particleImageSize = new Range(0.3, 0.6);
             burstParticle.spawnPerSeconds = 0;
             burstParticle.velocityRange = new Range(300, 350); // Velocity range for particles
             burstParticle.lifetimeRange = new Range(1, 2); // Lifetime between 1 and 2 seconds
@@ -508,17 +611,44 @@ class Game extends GameCanvas {
             return burstParticle;
         }, 20);
 
+        this.backgroundElement = document.getElementById('background');
+        this.backgroundElement.style.width = this.canvas.width + "px";
+        this.backgroundElement.style.height = this.canvas.height + "px";
+
         this.children.push(
-            this.ship,
+            // this.background,
             this.followCamera,
             this.boundary,
-            this.explosionEffectParticle
+            this.explosionEffectParticle,
+            this.ship,
         );
     }
 
     drawUI() {
-        drawText(this.context, `FPS: ${Math.round(this.fps)}`, 10, 20);
-        drawText(this.context, `Score: ${this.score}`, 10, 40);
+        super.drawUI();
+
+        this.drawLifeUI();
+
+        this.backgroundElement.style.backgroundPositionX = this.ship.pos.x * -0.5 + "px";
+        this.backgroundElement.style.backgroundPositionY = this.ship.pos.y * -0.5 + "px";
+        
+        if (this.scoreElement) {
+            this.scoreElement.innerText = `${this.score}`;
+        }
+        else {
+            drawText(this.context, `${this.score}`, 10, 40);
+        }
+    }
+
+    drawLifeUI() {
+        let globalOpacity = this.context.globalAlpha;
+        this.context.globalAlpha = this.life >= 3 ? 1 : 0.2;
+        this.context.drawImage(images.ship, this.canvas.width - 130, 10, 40, 40);
+        this.context.globalAlpha = this.life >= 2 ? 1 : 0.2;
+        this.context.drawImage(images.ship, this.canvas.width - 90, 10, 40, 40);
+        this.context.globalAlpha = this.life >= 1 ? 1 : 0.2;
+        this.context.drawImage(images.ship, this.canvas.width - 50, 10, 40, 40);
+        this.context.globalAlpha = globalOpacity; // Restore original opacity
     }
 
     onMouseEnter(event) {
@@ -596,6 +726,24 @@ class Game extends GameCanvas {
         explosion.pos = pos;
 
         let length = explosion.particles.length;
-        explosion.burst(randomInt(length / 2, length));
+        explosion.burst(randomInt(length / 2, length) * scale);
+    }
+
+    onShipHit(pos, scale) {
+        if (this.ship.getIsInvincible()) return;
+
+        // TODO: ship explode effects
+
+        this.life--;
+        if (this.life <= 0) {
+            this.onGameOver();
+            return;
+        }
+
+        this.ship.activateInvincibility();
+    }
+
+    onGameOver() {
+        this.ship.onGameOver();
     }
 }

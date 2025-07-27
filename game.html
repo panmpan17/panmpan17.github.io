@@ -4,6 +4,10 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Game</title>
+
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Bitcount:wght@400&display=swap" rel="stylesheet">
     
     <style>
         body {
@@ -11,14 +15,57 @@
 
         }
         canvas#gameCanvas {
-            /* background-color: #f0f0f0; */
             display: block;
-            border: 1px solid black;
+        }
+
+        div#background {
+            position: absolute;
+            top: 8px;
+            left: 8px;
+            background-image: url('/images/game/stars_bg.jpg');
+            z-index: -1;
+            /* background-size: 150%;; */
+        }
+
+        #fps {
+            position: fixed;
+            top: 10px;
+            left: 10px;
+            color: white;
+            font-family: Arial, sans-serif;
+            font-size: 14px;
+            background-color: rgba(0, 0, 0, 0.5);
+            padding: 5px;
+            border-radius: 3px;
+        }
+        
+        #score {
+            font-family: "Bitcount", system-ui;
+            font-optical-sizing: auto;
+            font-weight: 400;
+            font-style: normal;
+            font-variation-settings:
+                "slnt" 0,
+                "CRSV" 0.5,
+                "ELSH" 0,
+                "ELXP" 0;
+
+            position: fixed;
+            top: 10px;
+            right: 0;
+            left: 0;
+            text-align: center;
+            font-size: 48px;
+            color: #f47311;
+            text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.294);
         }
     </style>
 </head>
 <body>
+    <div id="background"></div>
     <canvas id="gameCanvas" width="800" height="600"></canvas>
+    <div id="fps">FPS: 60</div>
+    <div id="score">0</div>
 
     <script src="/javascript/game/math.js"></script>
     <script src="/javascript/game/draw.js"></script>
@@ -33,21 +80,22 @@
             Promise.all([
                 loadImage('ship', '/images/game/ship.png'),
                 loadImage('asteroid', '/images/game/asteroid.png'),
+                loadImage('asteroidBit', '/images/game/asteroid_bit.png'),
                 loadImage('dust1', '/images/game/dust_1.png'),
                 loadImage('dust2', '/images/game/dust_2.png'),
                 loadImage('dust3', '/images/game/dust_3.png'),
                 loadImage('dust4', '/images/game/dust_4.png'),
                 loadImage('fire', '/images/game/fire.png'),
+                loadImage('background', '/images/game/background.jpg'),
                 // Add more images as needed
             ]).then(() => {
                 console.log('All images loaded successfully');
                 game = new Game();
+                game.showFPS = location.hostname == "127.0.0.1";
+                game.showFPSElement = document.getElementById('fps');
+                game.drawGizmos = false && location.hostname == "127.0.0.1";
                 game.setup();
                 game.start();
-
-                // let testing = new TestingGround();
-                // testing.setup();
-                // testing.start();
             }).catch(error => {
                 console.error(error);
             });

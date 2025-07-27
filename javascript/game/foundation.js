@@ -12,6 +12,39 @@ function loadImage(name, src) {
     });
 }
 
+class PingPongTimer {
+    constructor(time) {
+        this.time = time;
+        this.timer = 0;
+        this.forward = true; // Animation direction
+    }
+
+    update(deltaTime) {
+        if (this.forward) {
+            this.timer += deltaTime;
+            if (this.timer >= this.time) {
+                this.timer = this.time;
+                this.forward = false; // Reverse the animation direction
+            }
+        } else {
+            this.timer -= deltaTime;
+            if (this.timer <= 0) {
+                this.timer = 0;
+                this.forward = true; // Reverse the animation direction
+            }
+        }
+    }
+
+    getProgress() {
+        return this.timer / this.time;
+    }
+
+    reset() {
+        this.timer = 0;
+        this.forward = true;
+    }
+}
+
 class Camera {
     constructor({ x, y, width, height }) {
         this.pos = new Vector(x, y);
@@ -190,6 +223,8 @@ class GameCanvas {
         this.children = [];
 
         this.fps = 0;
+        this.showFPS = false;
+        this.showFPSElement = null;
     }
 
     start() {
@@ -223,5 +258,16 @@ class GameCanvas {
         this.drawUI();
     }
 
-    drawUI() {}
+    drawUI() {
+        if (this.showFPS) {
+            if (this.showFPSElement) {
+                this.showFPSElement.textContent = `FPS: ${this.fps}`;
+            }
+            else {
+                this.context.fillStyle = "white";
+                this.context.font = "12px Arial";
+                this.context.fillText(`FPS: ${this.fps}`, 10, 20);
+            }
+        }
+    }
 }
