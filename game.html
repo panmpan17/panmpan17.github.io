@@ -72,7 +72,7 @@
     <script src="/javascript/game/particle.js"></script>
     <script src="/javascript/game/foundation.js"></script>
     <script src="/javascript/game/game.js"></script>
-    <!-- <script src="/javascript/game/test_ground.js"></script> -->
+    <script src="/javascript/game/test_ground.js"></script>
 
     <script>
         (function() {
@@ -86,7 +86,6 @@
                 loadImage('dust3', '/images/game/dust_3.png'),
                 loadImage('dust4', '/images/game/dust_4.png'),
                 loadImage('fire', '/images/game/fire.png'),
-                loadImage('background', '/images/game/background.jpg'),
                 // Add more images as needed
             ]).then(() => {
                 console.log('All images loaded successfully');
@@ -96,6 +95,10 @@
                 game.drawGizmos = false && location.hostname == "127.0.0.1";
                 game.setup();
                 game.start();
+
+                // let testing = new TestingGround();
+                // testing.setup();
+                // testing.start();
             }).catch(error => {
                 console.error(error);
             });

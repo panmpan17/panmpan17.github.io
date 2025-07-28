@@ -73,6 +73,11 @@ class Vector {
         return new Vector(this.x * scalar, this.y * scalar);
     }
 
+    devide(scalar) {
+        if (scalar === 0) return new Vector(0, 0); // Avoid division by zero
+        return new Vector(this.x / scalar, this.y / scalar);
+    }
+
     sqrMagnitude() {
         return this.x * this.x + this.y * this.y;
     }

@@ -271,3 +271,53 @@ class GameCanvas {
         }
     }
 }
+
+class VirtualJoystick {
+    constructor() {
+        this.basePlatRadius = 80;
+        this.padding = 20;
+
+        this.buttonRadius = 25;
+
+        this.lockedDistance = 50;
+
+        this.center = new Vector(0, 0);
+        this.delta = new Vector(0, 0);
+        this.deltaProgress = new Vector(0, 0);
+    }
+
+    update(gameCanvas, deltaTime) {
+        this.center.x = gameCanvas.canvas.width - this.basePlatRadius - this.padding;
+        this.center.y = gameCanvas.canvas.height - this.basePlatRadius - this.padding;
+
+        if (gameCanvas.mouseDown) {
+            let delta = gameCanvas.mousePosition.subtract(this.center);
+            let magnitude = delta.magnitude();
+            // console.log(delta.devide(magnitude));
+            
+            if (magnitude > this.lockedDistance) {
+                this.delta = delta.multiply(this.lockedDistance / magnitude);
+            } else {
+                this.delta = delta;
+            };
+
+            this.deltaProgress = delta.devide(magnitude).multiply(clamp(magnitude / this.lockedDistance, 0, 1));
+        }
+        else {
+            this.delta = new Vector(0, 0);
+        }
+    }
+
+    draw(gameCanvas) {
+        drawCircle(gameCanvas.context,
+                   this.center.x,
+                   this.center.y,
+                   this.basePlatRadius, 'rgba(184, 214, 217, 0.5)');
+        
+
+        drawCircle(gameCanvas.context,
+                   this.center.x + this.delta.x,
+                   this.center.y + this.delta.y,
+                   this.buttonRadius, 'rgba(71, 89, 206, 0.9)');
+    }
+}

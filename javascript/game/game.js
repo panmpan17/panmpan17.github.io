@@ -79,6 +79,7 @@ class Ship extends SimpleImageNode {
 
         this.cursorCirclePosition = new Vector(0, 0);
 
+        this.joystick = null; // Virtual joystick for mobile
         this.clampDistance = 100;
         this.flySpeed = 3;
         this.accelerationSpeed = 150;
@@ -173,13 +174,27 @@ class Ship extends SimpleImageNode {
     }
 
     updateVelocity(gameCanvas, deltaTime) {
-        let delta = gameCanvas.mousePositionWorld.subtract(this.pos);
+        let delta;
+
+        if (this.joystick) {
+            delta = this.joystick.delta;
+        }
+        else {
+            delta = gameCanvas.mousePositionWorld.subtract(this.pos);
+        }
+        
         let targetRotation = delta.getAngleInRadians() + (3.14 / 2);
 
         this.rotation = rotateRadianTowards(this.rotation, targetRotation, this.rotateSpeed * deltaTime);
 
         if (delta.sqrMagnitude() > 0.01) {
-            let clamedDelta = delta.clampMagnitude(this.clampDistance);
+            let clamedDelta;
+            if (this.joystick) {
+                clamedDelta = this.joystick.deltaProgress.multiply(this.clampDistance);
+            }
+            else {
+                clamedDelta = delta.clampMagnitude(this.clampDistance);
+            }
             this.cursorCirclePosition = this.pos.add(clamedDelta);
             let targetVelocity = clamedDelta.multiply(this.flySpeed); // Speed factor
             this.velocity = this.velocity.moveTowards(targetVelocity, this.accelerationSpeed * deltaTime);
@@ -279,8 +294,8 @@ class Ship extends SimpleImageNode {
             return;
         }
 
-        // this.shootBullet = true;
-        // this.mouseDown = true;
+        this.shootBullet = true;
+        this.mouseDown = true;
         this.fire.scale = 1;
         if (this.smokeParticle) {
             this.smokeParticle.spawningEnabled = true;
@@ -575,7 +590,13 @@ class Game extends GameCanvas {
 
         this.lastTime = null;
 
+        this.virtualJoystick = null;
+        if ('ontouchstart' in window || navigator.maxTouchPoints || this.forceJoystick) {
+            this.virtualJoystick = new VirtualJoystick();
+        }
+
         this.ship = new Ship(0, 0);
+        this.ship.joystick = this.virtualJoystick;
         this.followCamera = new FollowCamera({
             camera: this.camera,
             target: this.ship
@@ -622,6 +643,10 @@ class Game extends GameCanvas {
             this.explosionEffectParticle,
             this.ship,
         );
+
+        if (this.virtualJoystick) {
+            this.children.push(this.virtualJoystick);
+        }
     }
 
     drawUI() {
