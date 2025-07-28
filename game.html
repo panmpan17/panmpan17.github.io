@@ -10,25 +10,37 @@
     <link href="https://fonts.googleapis.com/css2?family=Bitcount:wght@400&display=swap" rel="stylesheet">
     
     <style>
+        * {
+            box-sizing: border-box;
+        }
         body {
             background-color: #bababa;
 
+            user-select: none;
+            -webkit-user-select: none;
         }
+
+        .game-container {
+            position: relative;
+            width: 800px;
+            height: 600px;
+            margin: 0 auto;
+            overflow: hidden;
+        }
+
         canvas#gameCanvas {
             display: block;
+            border: 1px solid #000;
         }
 
         div#background {
             position: absolute;
-            top: 8px;
-            left: 8px;
             background-image: url('/images/game/stars_bg.jpg');
             z-index: -1;
-            /* background-size: 150%;; */
         }
 
         #fps {
-            position: fixed;
+            position: absolute;
             top: 10px;
             left: 10px;
             color: white;
@@ -50,7 +62,7 @@
                 "ELSH" 0,
                 "ELXP" 0;
 
-            position: fixed;
+            position: absolute;
             top: 10px;
             right: 0;
             left: 0;
@@ -59,13 +71,52 @@
             color: #f47311;
             text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.294);
         }
+
+        #start-screen {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background-color: rgba(0, 0, 0, 0.5);
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            color: white;
+            font-size: 24px;
+            font-family: Arial, sans-serif;
+        }
+        #start-button {
+            width: 200px;
+            height: 200px;
+            background: radial-gradient(circle, #a1f411, #04c25a);
+            border-radius: 50%;
+            cursor: pointer;
+            transition: transform 0.2s;
+            transform: scale(0.8);
+        }
+        #start-button:hover {
+            transform: scale(0.9);
+        }
+        #start-button:active {
+            transform: scale(0.8);
+            filter: brightness(0.9);
+        }
     </style>
 </head>
 <body>
-    <div id="background"></div>
-    <canvas id="gameCanvas" width="800" height="600"></canvas>
-    <div id="fps">FPS: 60</div>
-    <div id="score">0</div>
+    <div class="game-container">
+        <div id="background"></div>
+        <canvas id="gameCanvas" width="800" height="600"></canvas>
+        <div id="fps">FPS: 60</div>
+        <div id="score">0</div>
+
+        <div id="start-screen">
+            <svg id="start-button" width="200" height="200" onclick="onStartButtonClick()">
+                <polygon points="80,50 80,150 150,100" fill="white" />
+            </svg>
+        </div>
+    </div>
 
     <script src="/javascript/game/math.js"></script>
     <script src="/javascript/game/draw.js"></script>
@@ -75,34 +126,37 @@
     <script src="/javascript/game/test_ground.js"></script>
 
     <script>
-        (function() {
-            // Load images
-            Promise.all([
-                loadImage('ship', '/images/game/ship.png'),
-                loadImage('asteroid', '/images/game/asteroid.png'),
-                loadImage('asteroidBit', '/images/game/asteroid_bit.png'),
-                loadImage('dust1', '/images/game/dust_1.png'),
-                loadImage('dust2', '/images/game/dust_2.png'),
-                loadImage('dust3', '/images/game/dust_3.png'),
-                loadImage('dust4', '/images/game/dust_4.png'),
-                loadImage('fire', '/images/game/fire.png'),
-                // Add more images as needed
-            ]).then(() => {
-                console.log('All images loaded successfully');
-                game = new Game();
-                game.showFPS = location.hostname == "127.0.0.1";
-                game.showFPSElement = document.getElementById('fps');
-                game.drawGizmos = false && location.hostname == "127.0.0.1";
-                game.setup();
-                game.start();
+        // Load images
+        Promise.all([
+            loadImage('ship', '/images/game/ship.png'),
+            loadImage('asteroid', '/images/game/asteroid.png'),
+            loadImage('asteroidBit', '/images/game/asteroid_bit.png'),
+            loadImage('dust1', '/images/game/dust_1.png'),
+            loadImage('dust2', '/images/game/dust_2.png'),
+            loadImage('dust3', '/images/game/dust_3.png'),
+            loadImage('dust4', '/images/game/dust_4.png'),
+            loadImage('fire', '/images/game/fire.png'),
+            // Add more images as needed
+        ]).then(() => {
+            console.log('All images loaded successfully');
+            game = new Game();
+            game.showFPS = location.hostname == "127.0.0.1";
+            game.showFPSElement = document.getElementById('fps');
+            game.drawGizmos = false && location.hostname == "127.0.0.1";
+            game.setup();
 
-                // let testing = new TestingGround();
-                // testing.setup();
-                // testing.start();
-            }).catch(error => {
-                console.error(error);
-            });
-        })();
+            // let testing = new TestingGround();
+            // testing.setup();
+        }).catch(error => {
+            console.error(error);
+        });
+        
+        function onStartButtonClick() {
+            const startScreen = document.getElementById('start-screen');
+            startScreen.style.display = 'none';
+            game.start();
+            // testing.start();
+        }
     </script>
 </body>
 </html>

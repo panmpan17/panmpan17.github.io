@@ -558,10 +558,12 @@ class Game extends GameCanvas {
     constructor() {
         super('gameCanvas');
 
-        const width = window.innerWidth;
-        const height = window.innerHeight;
-        this.canvas.width = width - 20;
-        this.canvas.height = height - 20;
+        const width = window.innerWidth - 20;
+        const height = window.innerHeight - 20;
+        this.canvas.parentElement.style.width = width + "px";
+        this.canvas.parentElement.style.height = height + "px";
+        this.canvas.width = width;
+        this.canvas.height = height;
 
         this.canvas.addEventListener('mousedown', this.onMouseDown.bind(this));
         this.canvas.addEventListener('mouseup', this.onMouseUp.bind(this));
