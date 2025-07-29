@@ -120,6 +120,28 @@ class Ship extends SimpleImageNode {
         this.active = true;
     }
 
+    reset() {
+        this.active = true;
+        this.ship.velocity = VectorZero;
+        this.ship.rotation = 0;
+        this.fire.scale = 0;
+        this.timeSinceLastShot = 0;
+        this.opacity = 1;
+        this.invincibleTimer = this.invincibleTime;
+        this.invincibleBlink.reset();
+
+        this.shootBullet = false;
+        for (let bullet of this.bullets) {
+            bullet.active = false;
+        }
+
+        this.smokeParticle.reset();
+        this.smokeParticle.spawningEnabled = false;
+
+        this.cursorCirclePosition = new Vector(0, 0);
+        this.mouseDown = false;
+    }
+
     getIsInvincible() {
         return this.invincibleTimer < this.invincibleTime;
     }
@@ -133,6 +155,12 @@ class Ship extends SimpleImageNode {
     }
 
     update(gameCanvas, deltaTime) {
+        if (this.smokeParticle) {
+            this.smokeParticle.direction = this.rotation + (3.14 / 2); // Rotate to face the direction of movement
+            this.smokeParticle.pos = this.translate(this.smokeParticle.childPos);
+            this.smokeParticle.update(gameCanvas, deltaTime);
+        }
+
         if (!this.active) {
             return;
         }
@@ -148,12 +176,6 @@ class Ship extends SimpleImageNode {
         }
 
         this.pos = this.pos.add(this.velocity.multiply(deltaTime));
-
-        if (this.smokeParticle) {
-            this.smokeParticle.direction = this.rotation + (3.14 / 2); // Rotate to face the direction of movement
-            this.smokeParticle.pos = this.translate(this.smokeParticle.childPos);
-            this.smokeParticle.update(gameCanvas, deltaTime);
-        }
 
         this.fire.update(gameCanvas, deltaTime);
 
@@ -235,12 +257,12 @@ class Ship extends SimpleImageNode {
     }
 
     draw(gameCanvas) {
-        if (!this.active) {
-            return;
-        }
-
         if (this.smokeParticle) {
             this.smokeParticle.draw(gameCanvas);
+        }
+
+        if (!this.active) {
+            return;
         }
 
         for (let bullet of this.bullets) {
@@ -286,7 +308,8 @@ class Ship extends SimpleImageNode {
         this.active = false;
         this.shootBullet = false;
         this.mouseDown = false;
-        this.smokeParticle.reset();
+        this.smokeParticle.spawningEnabled = false;
+        // this.smokeParticle.reset();
     }
 
     onMouseDown(event) {
@@ -442,6 +465,11 @@ class Boundary {
         this.targetAsteroidCount = 5;
 
         this.currentAsteroidCount = 0;
+    }
+
+    reset() {
+        this.currentAsteroidCount = 0;
+        this.asteroids.forEach(asteroid => asteroid.active = false);
     }
 
     shouldDespawn(point) {
@@ -651,6 +679,15 @@ class Game extends GameCanvas {
         }
     }
 
+    restart() {
+        this.score = 0;
+        this.life = 3;
+
+        this.ship.reset();
+        this.boundary.reset();
+        // TODO: reset explosion effect
+    }
+
     drawUI() {
         super.drawUI();
 
@@ -772,5 +809,15 @@ class Game extends GameCanvas {
 
     onGameOver() {
         this.ship.onGameOver();
+
+        setTimeout(() => {
+            const gameOverScreen = document.getElementById('game-over');
+            gameOverScreen.classList.add('show');
+    
+            setTimeout(() => {
+                const retryButton = document.getElementById('retry-button');
+                retryButton.classList.add('show');
+            }, 2000);
+        }, 1000);
     }
 }

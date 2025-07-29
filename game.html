@@ -33,7 +33,7 @@
             border: 1px solid #000;
         }
 
-        div#background {
+        #background {
             position: absolute;
             background-image: url('/images/game/stars_bg.jpg');
             z-index: -1;
@@ -50,8 +50,8 @@
             padding: 5px;
             border-radius: 3px;
         }
-        
-        #score {
+
+        .font-bitcount {
             font-family: "Bitcount", system-ui;
             font-optical-sizing: auto;
             font-weight: 400;
@@ -61,7 +61,9 @@
                 "CRSV" 0.5,
                 "ELSH" 0,
                 "ELXP" 0;
-
+        }
+        
+        #score {
             position: absolute;
             top: 10px;
             right: 0;
@@ -102,6 +104,59 @@
             transform: scale(0.8);
             filter: brightness(0.9);
         }
+
+        #game-over {
+            position: absolute;
+            display: flex;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background-color: rgba(0, 0, 0, 0.7);
+            justify-content: center;
+            align-items: center;
+            flex-wrap: wrap;
+            opacity: 0;
+            font-size: 4em;
+            z-index: -1;
+        }
+
+        #game-over.show {
+            opacity: 1;
+            transition: 1s ease-in-out;
+            z-index: 100;
+        }
+
+        #game-over p {
+            width: 100%;
+            text-align: center; 
+            /* font-size: 2em; */
+            color: rgb(205, 35, 35);
+        }
+
+        #game-over #retry-button {
+            background: none;
+            cursor: pointer;
+            color: rgb(186, 186, 186);
+            transform: scale(0.9);
+            border: none;
+            font-size: 36px;
+            opacity: 0;
+        }
+        #game-over #retry-button.show {
+            opacity: 1;
+            transition: opacity 0.5s ease-in-out, transform 0.5s ease-in-out;
+        }
+
+        #game-over #retry-button:hover {
+            transform: scale(1);
+            color: white;
+        }
+        #game-over #retry-button:active {
+            transform: scale(0.9);
+            filter: brightness(0.9);
+            color: rgb(229, 229, 229);
+        }
     </style>
 </head>
 <body>
@@ -109,12 +164,20 @@
         <div id="background"></div>
         <canvas id="gameCanvas" width="800" height="600"></canvas>
         <div id="fps">FPS: 60</div>
-        <div id="score">0</div>
+        <div id="score" class="font-bitcount">0</div>
 
         <div id="start-screen">
             <svg id="start-button" width="200" height="200" onclick="onStartButtonClick()">
                 <polygon points="80,50 80,150 150,100" fill="white" />
             </svg>
+        </div>
+
+        <div id="game-over" hidden>
+            <p class="font-bitcount">
+                Game Over
+                <br>
+                <button id="retry-button" onclick="onRetryButtonClick()" class="font-bitcount">Try Again</button>
+            </p>
         </div>
     </div>
 
@@ -152,10 +215,17 @@
         });
         
         function onStartButtonClick() {
+            console.log('Start button clicked');
             const startScreen = document.getElementById('start-screen');
             startScreen.style.display = 'none';
             game.start();
             // testing.start();
+        }
+
+        function onRetryButtonClick() {
+            const gameOverScreen = document.getElementById('game-over');
+            gameOverScreen.classList.remove('show');
+            game.restart();
         }
     </script>
 </body>
