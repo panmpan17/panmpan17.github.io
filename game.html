@@ -192,6 +192,8 @@
         // Load images
         Promise.all([
             loadImage('ship', '/images/game/ship.png'),
+            loadImage('shipLeft', '/images/game/ship_left.png'),
+            loadImage('shipRight', '/images/game/ship_right.png'),
             loadImage('asteroid', '/images/game/asteroid.png'),
             loadImage('asteroidBit', '/images/game/asteroid_bit.png'),
             loadImage('dust1', '/images/game/dust_1.png'),
@@ -199,6 +201,8 @@
             loadImage('dust3', '/images/game/dust_3.png'),
             loadImage('dust4', '/images/game/dust_4.png'),
             loadImage('fire', '/images/game/fire.png'),
+            loadImage('pythonPowerUp', '/images/game/python.png'),
+            loadImage('shine', '/images/game/shine.png'),
             // Add more images as needed
         ]).then(() => {
             console.log('All images loaded successfully');
@@ -207,6 +211,8 @@
             game.showFPSElement = document.getElementById('fps');
             game.drawGizmos = false && location.hostname == "127.0.0.1";
             game.setup();
+
+            onStartButtonClick();
 
             // let testing = new TestingGround();
             // testing.setup();

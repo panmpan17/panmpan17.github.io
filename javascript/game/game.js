@@ -207,7 +207,19 @@ class Ship extends SimpleImageNode {
         
         let targetRotation = delta.getAngleInRadians() + (3.14 / 2);
 
-        this.rotation = rotateRadianTowards(this.rotation, targetRotation, this.rotateSpeed * deltaTime);
+        let rotation = rotateRadianTowards(this.rotation, targetRotation, this.rotateSpeed * deltaTime);
+        // let rotatinoDelta = rotation - this.rotation;
+
+        // if (Math.abs(rotatinoDelta) < 0.0001) {
+        //     this.image = images.ship; // Default ship image
+        // }
+        // else if (rotatinoDelta > 0) {
+        //     this.image = images.shipRight; // Ship turning right
+        // }
+        // else {
+        //     this.image = images.shipLeft; // Ship turning left
+        // }
+        this.rotation = rotation;
 
         if (delta.sqrMagnitude() > 0.01) {
             let clamedDelta;
@@ -390,6 +402,66 @@ class ShipFire {
 
     translate(childPos) {
         return this.pos.add(childPos.rotate(this.rotation));
+    }
+}
+
+class PowerUpPickup extends SimpleImageNode {
+    constructor({ image, scale }) {
+        super({ image, x: -200, y: 0, scale });
+        this.baseScale = scale;
+
+        this.velocity = VectorZero;
+        this.active = true;
+
+        this.pingPongtimer = new PingPongTimer(0.4);
+        this.pingPongtimer2 = new PingPongTimer(0.7);
+        this.pingPongtimer.reset();
+
+        this.shine = new SimpleImageNode({
+            image: images.shine,
+            x: 0, y: 0,
+            scale: 0.7
+        });
+    }
+
+    update(gameCanvas, deltaTime) {
+        if (!this.active) {
+            return;
+        }
+
+        let delta = gameCanvas.ship.pos.subtract(this.pos);
+        let radiusCombined = gameCanvas.ship.getCollisionRadius() + this.getCollisionRadius();
+        if (delta.sqrMagnitude() < radiusCombined * radiusCombined) {
+            this.active = false; // Deactivate power-up
+            return;
+        }
+
+        this.pingPongtimer.update(deltaTime);
+        this.scale = lerp(this.baseScale * 0.8, this.baseScale * 1.2, this.pingPongtimer.getProgress());
+
+        this.shine.rotation += deltaTime
+        this.shine.scale = lerp(0.65, 0.75, this.pingPongtimer.getProgress());
+    }
+
+    getCollisionRadius() {
+        return this.image.width * this.baseScale * 0.6;
+    }
+
+    draw(gameCanvas) {
+        if (!this.active) {
+            return;
+        }
+        this.shine.pos = this.pos;
+        this.shine.draw(gameCanvas);
+        super.draw(gameCanvas);
+
+        if (gameCanvas.drawGizmos) {
+            let pos = gameCanvas.camera.worldToScreen(this.pos.x, this.pos.y);
+            drawWiredCircle(gameCanvas.context, 
+                pos.x, 
+                pos.y, 
+                this.getCollisionRadius(), CollisionColor);
+        }
     }
 }
 
@@ -666,11 +738,17 @@ class Game extends GameCanvas {
         this.backgroundElement.style.width = this.canvas.width + "px";
         this.backgroundElement.style.height = this.canvas.height + "px";
 
+        let pythonPowerUp = new PowerUpPickup({
+            image: images.pythonPowerUp,
+            scale: 0.25,
+        });
+
         this.children.push(
             // this.background,
             this.followCamera,
             this.boundary,
             this.explosionEffectParticle,
+            pythonPowerUp,
             this.ship,
         );
 
