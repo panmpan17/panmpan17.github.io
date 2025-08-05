@@ -118,6 +118,8 @@ class Ship extends SimpleImageNode {
         this.invincibleBlink = new PingPongTimer(0.3);
 
         this.active = true;
+        
+        this.abilities = [];
     }
 
     reset() {
@@ -151,7 +153,21 @@ class Ship extends SimpleImageNode {
     }
 
     getCollisionRadius() {
+        for (let ability of this.abilities) {
+            if (ability instanceof ProtectedShieldAbility) {
+                return true;
+            }
+        }
         return this.image.width * this.scale / 2 * 0.4;
+    }
+
+    getCanDestroyAsteroid() {
+        for (let ability of this.abilities) {
+            if (ability instanceof ProtectedShieldAbility) {
+                return true;
+            }
+        }
+        return false;
     }
 
     update(gameCanvas, deltaTime) {
@@ -191,6 +207,13 @@ class Ship extends SimpleImageNode {
             else {
                 this.invincibleBlink.update(deltaTime);
                 this.opacity = lerp(0.4, 0.7, this.invincibleBlink.getProgress());
+            }
+        }
+
+        for (let i = this.abilities.length - 1; i >= 0; i--) {
+            let ability = this.abilities[i];
+            if (ability.update(this, gameCanvas, deltaTime)) {
+                this.abilities.splice(i, 1);
             }
         }
     }
@@ -291,6 +314,10 @@ class Ship extends SimpleImageNode {
         gameCanvas.context.globalAlpha = this.opacity;
         super.draw(gameCanvas);
         gameCanvas.context.globalAlpha = globalAlpha;
+
+        for (let ability of this.abilities) {
+            ability.draw(this, gameCanvas);
+        }
 
         // drawText(gameCanvas.context, `Pos: ${round(this.pos.x)}, ${round(this.pos.y)}`, 10, 20);
         // drawText(gameCanvas.context, `Vel: ${round(this.velocity.x)}, ${round(this.velocity.y)}`, 10, 40);
@@ -406,9 +433,10 @@ class ShipFire {
 }
 
 class PowerUpPickup extends SimpleImageNode {
-    constructor({ image, scale }) {
+    constructor({ image, scale, ability }) {
         super({ image, x: -200, y: 0, scale });
         this.baseScale = scale;
+        this.ability = ability;
 
         this.velocity = VectorZero;
         this.active = true;
@@ -433,6 +461,10 @@ class PowerUpPickup extends SimpleImageNode {
         let radiusCombined = gameCanvas.ship.getCollisionRadius() + this.getCollisionRadius();
         if (delta.sqrMagnitude() < radiusCombined * radiusCombined) {
             this.active = false; // Deactivate power-up
+            if (this.ability) {
+                console.log(this.ability);
+                gameCanvas.ship.abilities.push(this.ability);
+            }
             return;
         }
 
@@ -465,11 +497,38 @@ class PowerUpPickup extends SimpleImageNode {
     }
 }
 
+class ProtectedShieldAbility {
+    constructor() {
+        this.duration = 15;
+        this.timer = 0;
+
+        this.shield = new SimpleImageNode({
+            image: images.shield,
+            x: 0, y: 0,
+            scale: 0.8,
+        });
+    }
+
+    update(ship, gameCanvas, deltaTime) {
+        this.timer += deltaTime;
+
+        return this.timer >= this.duration;
+    }
+
+    draw(ship, gameCanvas) {
+        this.shield.pos = ship.getCollisionCenter();
+        this.shield.rotation = ship.rotation;
+        this.shield.draw(gameCanvas);
+    }
+}
+
 class Asteroid extends SimpleImageNode {
-    constructor(scale) {
+    constructor(scale, health) {
         super({ image: images.asteroid, x: 0, y: 0, scale });
         this.velocity = VectorZero;
         this.active = false;
+        this.maxHealth = health;
+        this.health = health;
     }
 
     setPositionAndVelocity(pos, velocity) {
@@ -508,6 +567,22 @@ class Asteroid extends SimpleImageNode {
                 this.getCollisionRadius(), CollisionColor);
         }
     }
+    
+    reset() {
+        this.health = this.maxHealth;
+        this.active = true;
+    }
+
+    takeDamage(damage) {
+        this.health -= damage;
+        if (this.health <= 0) {
+            this.active = false;
+            game.onAsteroidHit(this.pos, this.scale);
+            return true;
+        }
+
+        return false;
+    }
 }
 
 class Boundary {
@@ -521,14 +596,16 @@ class Boundary {
         this.asteroids = [];
 
         this.FULL_ASTEROID_SIZE = 0.8;
+        this.FULL_ASTEROID_HEALTH = 3;
+        this.SMALL_ASTEROID_HEALTH = 2;
 
         const ASTEROID_COUNT = 6;
         for (let i = 0; i < ASTEROID_COUNT; i++) {
-            this.largeAsteroids.push(new Asteroid(this.FULL_ASTEROID_SIZE));
+            this.largeAsteroids.push(new Asteroid(this.FULL_ASTEROID_SIZE, this.FULL_ASTEROID_HEALTH));
             this.asteroids.push(this.largeAsteroids[i]);
         }
         for (let i = 0; i < ASTEROID_COUNT * 2; i++) {
-            this.smallAsteroids.push(new Asteroid(this.FULL_ASTEROID_SIZE / 2));
+            this.smallAsteroids.push(new Asteroid(this.FULL_ASTEROID_SIZE / 2, this.SMALL_ASTEROID_HEALTH));
             this.asteroids.push(this.smallAsteroids[i]);
         }
 
@@ -566,18 +643,29 @@ class Boundary {
                     this.currentAsteroidCount--;
                 }
                 else if (this.checkAsteroidAgainstBullets(this.asteroids[i])) {
-                    this.asteroids[i].active = false;
-                    this.currentAsteroidCount--;
+                    if (this.asteroids[i].takeDamage(1)) {
+                        this.currentAsteroidCount--;
 
-                    gameCanvas.onAsteroidHit(this.asteroids[i].pos, this.asteroids[i].scale);
-
-                    if (this.asteroids[i].scale >= this.FULL_ASTEROID_SIZE) {
-                        this.spawnSmallAsteroid(this.asteroids[i].pos, 0.5);
-                        this.spawnSmallAsteroid(this.asteroids[i].pos, 0.5);
+                        if (this.asteroids[i].scale >= this.FULL_ASTEROID_SIZE) {
+                            this.spawnSmallAsteroid(this.asteroids[i].pos, 0.5);
+                            this.spawnSmallAsteroid(this.asteroids[i].pos, 0.5);
+                        }
                     }
                 }
                 else if (this.checkAsteroidAgainstShip(this.asteroids[i], gameCanvas.ship)) {
-                    gameCanvas.onShipHit(this.asteroids[i].pos, this.asteroids[i].scale);
+                    if (gameCanvas.ship.getCanDestroyAsteroid()) {
+                        if (this.asteroids[i].takeDamage(100)) {
+                            this.currentAsteroidCount--;
+
+                            if (this.asteroids[i].scale >= this.FULL_ASTEROID_SIZE) {
+                                this.spawnSmallAsteroid(this.asteroids[i].pos, 0.5);
+                                this.spawnSmallAsteroid(this.asteroids[i].pos, 0.5);
+                            }
+                        }
+                    }
+                    else {
+                        gameCanvas.onShipHit(this.asteroids[i].pos, this.asteroids[i].scale);
+                    }
                 }
             }
         }
@@ -638,8 +726,8 @@ class Boundary {
                 let scale = this.asteroidRandomScale.random();
                 let velocity = getRandomVector().multiply(this.asteroidRandomSpeed.random() * speedFactor);
 
+                asteroidList[i].reset();
                 asteroidList[i].setPositionAndVelocity(pos, velocity);
-                asteroidList[i].active = true;
                 return;
             }
         }
@@ -741,6 +829,7 @@ class Game extends GameCanvas {
         let pythonPowerUp = new PowerUpPickup({
             image: images.pythonPowerUp,
             scale: 0.25,
+            ability: new ProtectedShieldAbility(),
         });
 
         this.children.push(
