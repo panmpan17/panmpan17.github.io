@@ -187,6 +187,7 @@
     <script src="/javascript/game/foundation.js"></script>
     <script src="/javascript/game/game.js"></script>
     <script src="/javascript/game/test_ground.js"></script>
+    <script src="/javascript/game/sound.js"></script>
 
     <script>
         // Load images
@@ -204,8 +205,13 @@
             loadImage('pythonPowerUp', '/images/game/python.png'),
             loadImage('shine', '/images/game/shine.png'),
             loadImage('shield', '/images/game/shield.png'),
+            loadImage('stoneCrack', '/images/game/stone_crack.png'),
             // Add more images as needed
         ]).then(() => {
+            preloadAudioIntoPool("/audios/laserShoot.wav", 15);
+            preloadAudioIntoPool("/audios/explosion.wav", 15);
+            preloadAudioIntoPool("/audios/hitHurt.wav", 15);
+
             console.log('All images loaded successfully');
             game = new Game();
             game.showFPS = location.hostname == "127.0.0.1";

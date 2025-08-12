@@ -34,6 +34,8 @@ class Bullet {
         this.velocity = velocity;
         this.active = true;
         this.life = 0;
+
+        playAudioFromPool("/audios/laserShoot.wav", 0.5);
     }
 
     update(gameCanvas, deltaTime) {
@@ -124,8 +126,8 @@ class Ship extends SimpleImageNode {
 
     reset() {
         this.active = true;
-        this.ship.velocity = VectorZero;
-        this.ship.rotation = 0;
+        this.velocity = VectorZero;
+        this.rotation = 0;
         this.fire.scale = 0;
         this.timeSinceLastShot = 0;
         this.opacity = 1;
@@ -529,6 +531,12 @@ class Asteroid extends SimpleImageNode {
         this.active = false;
         this.maxHealth = health;
         this.health = health;
+
+        this.crackImage = new SimpleImageNode({
+            image: images.stoneCrack,
+            x: 0, y: 0,
+            scale: 0.8,
+        });
     }
 
     setPositionAndVelocity(pos, velocity) {
@@ -558,6 +566,15 @@ class Asteroid extends SimpleImageNode {
         }
         super.draw(gameCanvas);
 
+        if (this.health < this.maxHealth) {
+            let percentage = 1 - (this.health / this.maxHealth);
+            this.crackImage.pos = this.pos;
+            this.crackImage.scale = this.scale * lerp(0.5, 1, percentage);
+            this.crackImage.rotation = this.rotation + percentage;
+            this.crackImage.opacity = percentage;
+            this.crackImage.draw(gameCanvas);
+        }
+
         if (gameCanvas.drawGizmos) {
             let center = this.getCollisionCenter();
             let pos = gameCanvas.camera.worldToScreen(center.x, center.y);
@@ -578,9 +595,11 @@ class Asteroid extends SimpleImageNode {
         if (this.health <= 0) {
             this.active = false;
             game.onAsteroidHit(this.pos, this.scale);
+            playAudioFromPool("/audios/explosion.wav", this.scale);
             return true;
         }
 
+        playAudioFromPool("/audios/hitHurt.wav", this.scale);
         return false;
     }
 }
